@@ -1,0 +1,52 @@
+﻿  Reading Qt configuration (C:\Qt\Qt5.6.3\5.6.3\msvc2015_64\bin\qmake.exe)
+  guiwindow.cpp
+  link1.cpp
+  link2.cpp
+  link3.cpp
+link3.cpp(185): warning C4189: 'alpha': local variable is initialized but not referenced
+  link4.cpp
+  link5.cpp
+  link6.cpp
+guiwindow.cpp(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+guiwindow.cpp(43): warning C4100: 'parent': unreferenced formal parameter
+guiwindow.cpp(153): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'double'
+guiwindow.cpp(153): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 2 has type 'double'
+guiwindow.cpp(201): warning C4305: 'initializing': truncation from 'double' to 'float'
+guiwindow.cpp(321): warning C4100: 'userdata': unreferenced formal parameter
+guiwindow.cpp(321): warning C4100: 'flags': unreferenced formal parameter
+guiwindow.cpp(359): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+guiwindow.cpp(463): warning C4100: 'angle': unreferenced formal parameter
+guiwindow.cpp(463): warning C4100: 'Z': unreferenced formal parameter
+guiwindow.cpp(463): warning C4100: 'Y': unreferenced formal parameter
+guiwindow.cpp(463): warning C4100: 'X': unreferenced formal parameter
+guiwindow.cpp(474): warning C4100: 'angle': unreferenced formal parameter
+guiwindow.cpp(474): warning C4100: 'Z': unreferenced formal parameter
+guiwindow.cpp(474): warning C4100: 'Y': unreferenced formal parameter
+guiwindow.cpp(474): warning C4100: 'X': unreferenced formal parameter
+link4.cpp(180): warning C4189: 'alpha': local variable is initialized but not referenced
+link4.cpp(188): warning C4189: 'c23': local variable is initialized but not referenced
+link4.cpp(188): warning C4189: 's23': local variable is initialized but not referenced
+link5.cpp(185): warning C4189: 'c1': local variable is initialized but not referenced
+link5.cpp(186): warning C4189: 's2': local variable is initialized but not referenced
+link5.cpp(179): warning C4189: 'alpha': local variable is initialized but not referenced
+link5.cpp(187): warning C4189: 'c23': local variable is initialized but not referenced
+link5.cpp(185): warning C4189: 's1': local variable is initialized but not referenced
+link5.cpp(186): warning C4189: 'c2': local variable is initialized but not referenced
+link5.cpp(188): warning C4189: 'c234': local variable is initialized but not referenced
+link5.cpp(188): warning C4189: 's234': local variable is initialized but not referenced
+link5.cpp(187): warning C4189: 's23': local variable is initialized but not referenced
+  main.cpp
+  modelloader.cpp
+  openglwindow.cpp
+f:\hanh_nhi\final_project\luan_van\8-7_phucnam(pickandhold_1object)\robot3d- working\melfamodel\guiwindow.cpp(281): warning C4715: 'GuiWindow::drawPred': not all control paths return a value
+  robotcontroll.cpp
+robotcontroll.cpp(204): warning C4100: 'time': unreferenced formal parameter
+main.cpp(26): warning C4129: 'c': unrecognized character escape sequence
+main.cpp(30): warning C4129: 'y': unrecognized character escape sequence
+main.cpp(31): warning C4129: 'y': unrecognized character escape sequence
+  qrc_shaders.cpp
+  moc_robotcontroll.cpp
+  moc_guiwindow.cpp
+  moc_openglwindow.cpp
+  MelfaModel.vcxproj -> F:\HANH_NHI\final_project\LUAN_VAN\8-7_phucnam(pickandhold_1object)\Robot3D- Working\MelfaModel\debug\MelfaModel.exe
+  MelfaModel.vcxproj -> debug\MelfaModel.pdb (Full PDB)

@@ -1,0 +1,40 @@
+﻿  Rcc'ing shaders.qrc...
+  Moc'ing guiwindow.h...
+  Moc'ing openglwindow.h...
+  guiwindow.cpp
+  link1.cpp
+  link2.cpp
+  link3.cpp
+link3.cpp(185): warning C4189: 'alpha': local variable is initialized but not referenced
+  link4.cpp
+  link5.cpp
+  link6.cpp
+  main.cpp
+link4.cpp(180): warning C4189: 'alpha': local variable is initialized but not referenced
+link4.cpp(188): warning C4189: 'c23': local variable is initialized but not referenced
+link4.cpp(188): warning C4189: 's23': local variable is initialized but not referenced
+link5.cpp(185): warning C4189: 'c1': local variable is initialized but not referenced
+link5.cpp(186): warning C4189: 's2': local variable is initialized but not referenced
+link5.cpp(179): warning C4189: 'alpha': local variable is initialized but not referenced
+link5.cpp(187): warning C4189: 'c23': local variable is initialized but not referenced
+link5.cpp(185): warning C4189: 's1': local variable is initialized but not referenced
+link5.cpp(186): warning C4189: 'c2': local variable is initialized but not referenced
+link5.cpp(188): warning C4189: 'c234': local variable is initialized but not referenced
+link5.cpp(188): warning C4189: 's234': local variable is initialized but not referenced
+link5.cpp(187): warning C4189: 's23': local variable is initialized but not referenced
+  modelloader.cpp
+  openglwindow.cpp
+e:\document\robot3d\melfamodel\modelloader.cpp(356): warning C4756: overflow in constant arithmetic
+  qrc_shaders.cpp
+  moc_guiwindow.cpp
+  moc_openglwindow.cpp
+link5.obj : error LNK2019: unresolved external symbol __imp_glDrawElements referenced in function "private: void __cdecl Link5::drawNode(struct Node const *,class QMatrix4x4)" (?drawNode@Link5@@AEAAXPEBUNode@@VQMatrix4x4@@@Z)
+link6.obj : error LNK2001: unresolved external symbol __imp_glDrawElements
+link1.obj : error LNK2001: unresolved external symbol __imp_glDrawElements
+link2.obj : error LNK2001: unresolved external symbol __imp_glDrawElements
+link3.obj : error LNK2001: unresolved external symbol __imp_glDrawElements
+link4.obj : error LNK2001: unresolved external symbol __imp_glDrawElements
+openglwindow.obj : error LNK2019: unresolved external symbol __imp_glClearColor referenced in function "public: virtual void __cdecl OpenGLWindow::initializeGL(void)" (?initializeGL@OpenGLWindow@@UEAAXXZ)
+openglwindow.obj : error LNK2019: unresolved external symbol __imp_glEnable referenced in function "public: virtual void __cdecl OpenGLWindow::initializeGL(void)" (?initializeGL@OpenGLWindow@@UEAAXXZ)
+openglwindow.obj : error LNK2019: unresolved external symbol __imp_glViewport referenced in function "public: virtual void __cdecl OpenGLWindow::resizeGL(int,int)" (?resizeGL@OpenGLWindow@@UEAAXHH@Z)
+release\\MelfaModel.exe : fatal error LNK1120: 4 unresolved externals
