@@ -30,7 +30,7 @@
 <QMake_QMAKE_VERSION_>3.0</QMake_QMAKE_VERSION_>
 <QMake_QT_VERSION_>5.6.3</QMake_QT_VERSION_>
 <Qt_INCLUDEPATH_
-      >$(Qt_INCLUDEPATH_);Debug;F:\HANH_NHI\final_project\LUAN_VAN\8-7_phucnam(pickandhold_1object)\Robot3D- Working\MelfaModel</Qt_INCLUDEPATH_>
+      >$(Qt_INCLUDEPATH_);Debug;F:\HANH_NHI\Thesis_Nam_Nhi\LV\MelfaModel</Qt_INCLUDEPATH_>
     <QtBkup_QtInstall
       >msvc2015_64</QtBkup_QtInstall>
     <QtBkup_QtModules

@@ -31,12 +31,12 @@ class Ui_GuiWindow
 {
 public:
     QWidget *centralwidget;
-    QWidget *widget;
+    QWidget *layoutWidget;
     QVBoxLayout *verticalLayout_5;
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout;
     QGroupBox *groupBox;
-    QWidget *layoutWidget;
+    QWidget *layoutWidget1;
     QVBoxLayout *verticalLayout_2;
     QHBoxLayout *horizontalLayout_2;
     QLabel *label_Comport;
@@ -57,28 +57,27 @@ public:
     QPushButton *pushButton_Stop;
     QPushButton *pushButton_TestMoveJoint;
     QGroupBox *groupBox_2;
-    QPushButton *pushButton_StartCamera;
-    QPushButton *pushButton_SetROI;
-    QTextEdit *textEdit_Position;
-    QWidget *widget1;
-    QVBoxLayout *verticalLayout_6;
-    QLabel *label_Camera;
+    QWidget *widget;
     QHBoxLayout *horizontalLayout_5;
     QPushButton *pushButton_Pick;
     QPushButton *pushButton_Hold;
     QPushButton *pushButton_Place;
+    QTextEdit *textEdit_Position;
+    QPushButton *pushButton_SetROI;
+    QLabel *label_Camera;
+    QPushButton *pushButton_StartCamera;
 
     void setupUi(QMainWindow *GuiWindow)
     {
         if (GuiWindow->objectName().isEmpty())
             GuiWindow->setObjectName(QStringLiteral("GuiWindow"));
-        GuiWindow->resize(1027, 600);
+        GuiWindow->resize(971, 597);
         centralwidget = new QWidget(GuiWindow);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
-        widget = new QWidget(centralwidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(0, 0, 100, 30));
-        verticalLayout_5 = new QVBoxLayout(widget);
+        layoutWidget = new QWidget(centralwidget);
+        layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
+        layoutWidget->setGeometry(QRect(0, 0, 100, 30));
+        verticalLayout_5 = new QVBoxLayout(layoutWidget);
         verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
         verticalLayout_5->setContentsMargins(0, 0, 0, 0);
         horizontalLayout = new QHBoxLayout(centralwidget);
@@ -87,20 +86,20 @@ public:
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         groupBox = new QGroupBox(centralwidget);
         groupBox->setObjectName(QStringLiteral("groupBox"));
-        layoutWidget = new QWidget(groupBox);
-        layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 20, 271, 248));
-        verticalLayout_2 = new QVBoxLayout(layoutWidget);
+        layoutWidget1 = new QWidget(groupBox);
+        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
+        layoutWidget1->setGeometry(QRect(10, 20, 271, 248));
+        verticalLayout_2 = new QVBoxLayout(layoutWidget1);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        label_Comport = new QLabel(layoutWidget);
+        label_Comport = new QLabel(layoutWidget1);
         label_Comport->setObjectName(QStringLiteral("label_Comport"));
 
         horizontalLayout_2->addWidget(label_Comport);
 
-        comboBox_Comport = new QComboBox(layoutWidget);
+        comboBox_Comport = new QComboBox(layoutWidget1);
         comboBox_Comport->setObjectName(QStringLiteral("comboBox_Comport"));
 
         horizontalLayout_2->addWidget(comboBox_Comport);
@@ -110,12 +109,12 @@ public:
 
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        label_Baudrate = new QLabel(layoutWidget);
+        label_Baudrate = new QLabel(layoutWidget1);
         label_Baudrate->setObjectName(QStringLiteral("label_Baudrate"));
 
         horizontalLayout_3->addWidget(label_Baudrate);
 
-        comboBox_Baudrate = new QComboBox(layoutWidget);
+        comboBox_Baudrate = new QComboBox(layoutWidget1);
         comboBox_Baudrate->setObjectName(QStringLiteral("comboBox_Baudrate"));
 
         horizontalLayout_3->addWidget(comboBox_Baudrate);
@@ -123,7 +122,7 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_3);
 
-        pushButton_Connect = new QPushButton(layoutWidget);
+        pushButton_Connect = new QPushButton(layoutWidget1);
         pushButton_Connect->setObjectName(QStringLiteral("pushButton_Connect"));
 
         verticalLayout_2->addWidget(pushButton_Connect);
@@ -132,12 +131,12 @@ public:
         horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
         verticalLayout_3 = new QVBoxLayout();
         verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
-        label_Velocity = new QLabel(layoutWidget);
+        label_Velocity = new QLabel(layoutWidget1);
         label_Velocity->setObjectName(QStringLiteral("label_Velocity"));
 
         verticalLayout_3->addWidget(label_Velocity);
 
-        sliderVelocity = new QSlider(layoutWidget);
+        sliderVelocity = new QSlider(layoutWidget1);
         sliderVelocity->setObjectName(QStringLiteral("sliderVelocity"));
         sliderVelocity->setMinimum(1);
         sliderVelocity->setMaximum(100);
@@ -150,12 +149,12 @@ public:
 
         verticalLayout_4 = new QVBoxLayout();
         verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
-        label_Accelerate = new QLabel(layoutWidget);
+        label_Accelerate = new QLabel(layoutWidget1);
         label_Accelerate->setObjectName(QStringLiteral("label_Accelerate"));
 
         verticalLayout_4->addWidget(label_Accelerate);
 
-        sliderAccerlerate = new QSlider(layoutWidget);
+        sliderAccerlerate = new QSlider(layoutWidget1);
         sliderAccerlerate->setObjectName(QStringLiteral("sliderAccerlerate"));
         sliderAccerlerate->setMinimum(1);
         sliderAccerlerate->setMaximum(100);
@@ -169,7 +168,7 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_4);
 
-        pushButton_Home = new QPushButton(layoutWidget);
+        pushButton_Home = new QPushButton(layoutWidget1);
         pushButton_Home->setObjectName(QStringLiteral("pushButton_Home"));
         QSizePolicy sizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -181,83 +180,66 @@ public:
 
         verticalLayout_2->addWidget(pushButton_Home);
 
-        pushButton_Scan = new QPushButton(layoutWidget);
+        pushButton_Scan = new QPushButton(layoutWidget1);
         pushButton_Scan->setObjectName(QStringLiteral("pushButton_Scan"));
 
         verticalLayout_2->addWidget(pushButton_Scan);
 
-        pushButton_Stop = new QPushButton(layoutWidget);
+        pushButton_Stop = new QPushButton(layoutWidget1);
         pushButton_Stop->setObjectName(QStringLiteral("pushButton_Stop"));
 
         verticalLayout_2->addWidget(pushButton_Stop);
 
-        pushButton_TestMoveJoint = new QPushButton(layoutWidget);
+        pushButton_TestMoveJoint = new QPushButton(layoutWidget1);
         pushButton_TestMoveJoint->setObjectName(QStringLiteral("pushButton_TestMoveJoint"));
 
         verticalLayout_2->addWidget(pushButton_TestMoveJoint);
 
         groupBox_2 = new QGroupBox(groupBox);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
-        groupBox_2->setGeometry(QRect(0, 280, 411, 311));
-        pushButton_StartCamera = new QPushButton(groupBox_2);
-        pushButton_StartCamera->setObjectName(QStringLiteral("pushButton_StartCamera"));
-        pushButton_StartCamera->setGeometry(QRect(270, 190, 30, 30));
-        pushButton_StartCamera->setMinimumSize(QSize(30, 30));
-        pushButton_StartCamera->setMaximumSize(QSize(30, 30));
-        pushButton_StartCamera->setStyleSheet(QLatin1String("#pushButton_StartCamera\n"
-"{\n"
-" border:none;\n"
-"}\n"
-""));
-        pushButton_SetROI = new QPushButton(groupBox_2);
-        pushButton_SetROI->setObjectName(QStringLiteral("pushButton_SetROI"));
-        pushButton_SetROI->setGeometry(QRect(280, 70, 75, 23));
-        textEdit_Position = new QTextEdit(groupBox_2);
-        textEdit_Position->setObjectName(QStringLiteral("textEdit_Position"));
-        textEdit_Position->setGeometry(QRect(290, 110, 104, 71));
-        widget1 = new QWidget(groupBox_2);
-        widget1->setObjectName(QStringLiteral("widget1"));
-        widget1->setGeometry(QRect(10, 20, 262, 271));
-        verticalLayout_6 = new QVBoxLayout(widget1);
-        verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
-        verticalLayout_6->setContentsMargins(0, 0, 0, 0);
-        label_Camera = new QLabel(widget1);
-        label_Camera->setObjectName(QStringLiteral("label_Camera"));
-        label_Camera->setMinimumSize(QSize(260, 200));
-        label_Camera->setMaximumSize(QSize(260, 200));
-        label_Camera->setFrameShape(QFrame::Box);
-        label_Camera->setFrameShadow(QFrame::Raised);
-        label_Camera->setLineWidth(5);
-
-        verticalLayout_6->addWidget(label_Camera);
-
-        horizontalLayout_5 = new QHBoxLayout();
+        groupBox_2->setGeometry(QRect(10, 270, 271, 311));
+        widget = new QWidget(groupBox_2);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setGeometry(QRect(0, 210, 260, 63));
+        horizontalLayout_5 = new QHBoxLayout(widget);
         horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
-        pushButton_Pick = new QPushButton(widget1);
+        horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
+        pushButton_Pick = new QPushButton(widget);
         pushButton_Pick->setObjectName(QStringLiteral("pushButton_Pick"));
 
         horizontalLayout_5->addWidget(pushButton_Pick);
 
-        pushButton_Hold = new QPushButton(widget1);
+        pushButton_Hold = new QPushButton(widget);
         pushButton_Hold->setObjectName(QStringLiteral("pushButton_Hold"));
 
         horizontalLayout_5->addWidget(pushButton_Hold);
 
-        pushButton_Place = new QPushButton(widget1);
+        pushButton_Place = new QPushButton(widget);
         pushButton_Place->setObjectName(QStringLiteral("pushButton_Place"));
 
         horizontalLayout_5->addWidget(pushButton_Place);
 
-
-        verticalLayout_6->addLayout(horizontalLayout_5);
-
-        pushButton_Place->raise();
-        pushButton_Pick->raise();
-        pushButton_SetROI->raise();
-        pushButton_StartCamera->raise();
-        label_Camera->raise();
-        label_Camera->raise();
-        textEdit_Position->raise();
+        textEdit_Position = new QTextEdit(groupBox_2);
+        textEdit_Position->setObjectName(QStringLiteral("textEdit_Position"));
+        textEdit_Position->setGeometry(QRect(10, 20, 251, 181));
+        pushButton_SetROI = new QPushButton(groupBox);
+        pushButton_SetROI->setObjectName(QStringLiteral("pushButton_SetROI"));
+        pushButton_SetROI->setGeometry(QRect(360, 510, 101, 23));
+        label_Camera = new QLabel(groupBox);
+        label_Camera->setObjectName(QStringLiteral("label_Camera"));
+        label_Camera->setGeometry(QRect(290, 0, 640, 480));
+        label_Camera->setMinimumSize(QSize(640, 480));
+        label_Camera->setMaximumSize(QSize(260, 200));
+        label_Camera->setFrameShape(QFrame::Box);
+        label_Camera->setFrameShadow(QFrame::Raised);
+        label_Camera->setLineWidth(5);
+        pushButton_StartCamera = new QPushButton(groupBox);
+        pushButton_StartCamera->setObjectName(QStringLiteral("pushButton_StartCamera"));
+        pushButton_StartCamera->setGeometry(QRect(480, 510, 75, 23));
+        pushButton_StartCamera->setStyleSheet(QLatin1String("#pushButton_StartCamera\n"
+"{\n"
+"border:none;\n"
+"}"));
 
         verticalLayout->addWidget(groupBox);
 
@@ -285,12 +267,12 @@ public:
         pushButton_Stop->setText(QApplication::translate("GuiWindow", "Stop", Q_NULLPTR));
         pushButton_TestMoveJoint->setText(QApplication::translate("GuiWindow", "Test Move Joint", Q_NULLPTR));
         groupBox_2->setTitle(QApplication::translate("GuiWindow", "Camera", Q_NULLPTR));
-        pushButton_StartCamera->setText(QString());
-        pushButton_SetROI->setText(QApplication::translate("GuiWindow", "Select  ROI", Q_NULLPTR));
-        label_Camera->setText(QString());
         pushButton_Pick->setText(QApplication::translate("GuiWindow", "PICK", Q_NULLPTR));
         pushButton_Hold->setText(QApplication::translate("GuiWindow", "HOLD", Q_NULLPTR));
         pushButton_Place->setText(QApplication::translate("GuiWindow", "PLACE", Q_NULLPTR));
+        pushButton_SetROI->setText(QApplication::translate("GuiWindow", "Select  ROI", Q_NULLPTR));
+        label_Camera->setText(QString());
+        pushButton_StartCamera->setText(QApplication::translate("GuiWindow", "Start Camera", Q_NULLPTR));
     } // retranslateUi
 
 };

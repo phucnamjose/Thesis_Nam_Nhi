@@ -22,21 +22,26 @@ double roll_place = 0;
 bool isFree = true;
 
 /*--Camera--*/
+vector<String> getOutputsNames(const Net& net);
 extern VideoCapture cap;
 extern Mat blob;
 extern Net net;
 extern vector<string> classes;
-vector<String> getOutputsNames(const Net& net);
-
+// Network Params
 float confThreshold = 0.7; // Confidence threshold
 float nmsThreshold = 0.5;  // Non-maximum suppression threshold
 int inpWidth = 416;        // Width of network's input image
 int inpHeight = 416;       // Height of network's input image
-     
-int i = 0;
+// Calibration Params
+const double W11 = 153.554757, W12 = -212.873131;
+const double W21 = 0.0110744904, W22 = 0.718174295;
+const double W31 = 0.706857752, W32 = 0.00278501969;
+// ROI
+int count_mouse = 0;
 bool flag_ROI = false;
 int x_pos[2];
 int y_pos[2];
+// Object
 int last_x, last_y, last_roll;
 
 // Get the names of the output layers
@@ -49,9 +54,6 @@ GuiWindow::GuiWindow(QWidget *parent) :
 	controller = new RobotControll(this);
 	gui_init();
 	robotInit();
-	//Icon
-	ui->pushButton_StartCamera->setIcon(QIcon("/HANH_NHI/final_project/LUAN_VAN/8-7_phucnam/Capture_OFF.JPG"));
-	ui->pushButton_StartCamera->setCheckable(true);
 	// Timer for update position
 	timer_CAM = new QTimer(this);
 	connect(timer_CAM, &QTimer::timeout, this, &GuiWindow::timer_CAM_handle);	
@@ -71,14 +73,18 @@ bool GuiWindow::detectObject(Mat frame, Mat &out)
 		Mat matROI;
 		selectROI(frame, matROI);
 		// Create a 4D blob from a frame.
-		blobFromImage(matROI, blob, 1 / 255.0, Size(inpWidth, inpHeight), Scalar(0, 0, 0), true, false);// tao ra blob tu hinh input //true swap B ,R //false :co cat hinh ra hay khong
+		blobFromImage(matROI, blob, 1 / 255.0, Size(inpWidth, inpHeight),
+						Scalar(0, 0, 0), true, false);// tao ra blob tu hinh input 
+													  //true swap B ,R 
+													  //false :co cat hinh ra hay khong
 		//Sets the input to the network																								 //Sets the input to the network
 		net.setInput(blob);
 		// Runs the forward pass to get output of the output layers
 		vector<Mat> outs; // local  variable
 		net.forward(outs, getOutputsNames(net)); //chay mang noron
-												 // Remove the bounding boxes with low confidence
-		postprocess(matROI, outs); // get outs into frame
+												 // Remove the bounding boxes with low 
+												 //confidence
+		postProcess(matROI, outs); // get outs into frame
 		//imshow("Detect Object", matROI); // show frame to camera window
 		out = matROI.clone();
 		return true;
@@ -92,7 +98,7 @@ bool GuiWindow::detectObject(Mat frame, Mat &out)
 }
 
 // Get the names of the output layers
-vector<String> getOutputsNames(const Net& net)
+vector<String>  getOutputsNames(const Net& net)
 {
 	static vector<String> names;
 	if (names.empty())
@@ -111,17 +117,14 @@ vector<String> getOutputsNames(const Net& net)
 	return names;
 }
 
-void GuiWindow::postprocess(Mat& frame, const vector<Mat>& outs)
+void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 {
-	
-	//if (!controller->isScan())  // not scan => out 
-	//return;
-	double X, Y;
-	double W11 = 153.554757, W12 = -212.873131, W21 = 0.0110744904, W22 = 0.718174295, W31 = 0.706857752, W32 = 0.00278501969;
+	vector<double> X, Y, ANGLE_TRUE, X_TRUE, Y_TRUE;
 	vector<int> classIds;
 	vector<float> confidences;
 	vector<Rect> boxes;
-
+	ui->textEdit_Position->clear();
+	//ui->textEdit_Position->append(tr("Outsize: %1 \n").arg(outs.size()));
 	for (size_t i = 0; i < outs.size(); ++i)
 	{
 		// Scan through all the bounding boxes output from the network and keep only the
@@ -137,66 +140,57 @@ void GuiWindow::postprocess(Mat& frame, const vector<Mat>& outs)
 			minMaxLoc(scores, 0, &confidence, 0, &classIdPoint);
 			if (confidence > confThreshold)
 			{
-				int centerX = (int)(data[0] * frame.cols);
-				int centerY = (int)(data[1] * frame.rows);
+				int x_roi = (int)(data[0] * frame.cols);
+				int y_roi = (int)(data[1] * frame.rows);
 
 				int width = (int)(data[2] * frame.cols);
 				int height = (int)(data[3] * frame.rows);
-				int left = centerX - width / 2;
-				int top = centerY - height / 2;
+				int left = x_roi - width / 2;
+				int top = y_roi - height / 2;
 
-				int Xc = centerX + x_pos[0];
-				int Yc = centerY + y_pos[0];
+				int x_cam = x_roi + x_pos[0];
+				int y_cam = y_roi + y_pos[0];
 
-				X = W11 + W21*Xc + W31*Yc;
-				Y = W12 + W22*Xc + W32*Yc;
-				printf(" toa do x= %d, y = %d \r\n", X, Y);
+				double x_absolute = W11 + W21*x_cam + W31*y_cam;
+				double y_absolute = W12 + W22*x_cam + W32*y_cam;
+				printf(" toa do x= %d, y = %d \r\n", x_absolute, y_absolute);
 				
-				//moveJoint(X, Y, Zlow, 0);
-				//if (controller->robotOutput(1))
-				//{
-					//moveJoint(0, 0, Zlow, 0);
-				//}
-				
+				X.push_back(x_absolute);
+				Y.push_back(y_absolute);
 				classIds.push_back(classIdPoint.x);
 				confidences.push_back((float)confidence);
 				boxes.push_back(Rect(left, top, width, height));
 			}
 		}
 	}
-
-	// Perform non maximum suppression to eliminate redundant overlapping boxes with lower confidences
+	//ui->textEdit_Position->append(tr("X size: %1 \n").arg(X.size()));
+	// Perform non maximum suppression to eliminate redundant overlapping 
+	//boxes with lower confidences
 	vector<int> indices;
 	NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
-	double angle;
+	//ui->textEdit_Position->append(tr("Indices size: %1 \n").arg(indices.size()));
 	for (size_t i = 0; i < indices.size(); ++i)
 	{
-		angle = 0;
+		double angle;
 		int idx = indices[i];
 		Rect box = boxes[idx];
-		drawPred(classIds[idx], confidences[idx], box.x, box.y,box.x + box.width, box.y + box.height, frame, angle);	
+		if (drawPred(classIds[idx], confidences[idx], box.x, box.y,
+			box.x + box.width, box.y + box.height, frame, angle))
+		{
+			X_TRUE.push_back(X.at(idx));
+			Y_TRUE.push_back(Y.at(idx));
+			ANGLE_TRUE.push_back(angle);
+		}
 	}
-
-	displayPosition(X, Y, angle);
-	
-
-	last_x = X;
-	last_y = Y;
-	last_roll = angle;
-	
-	/*if (pick)
+	ui->textEdit_Position->append(tr("ANGLE size: %1 \n").arg(ANGLE_TRUE.size()));
+	for(int i = 0; i < ANGLE_TRUE.size(); i++) 
 	{
-		x = X;
-		y = Y;
-		roll = angle;
-		controller->robotMoveJoint(x, y, 45, roll);
-		pick = false;
-	}*/
-
+		displayPosition(X_TRUE.at(i), Y_TRUE.at(i), ANGLE_TRUE.at(i));
+	}
 }
 
 // Draw the predicted bounding box
-bool GuiWindow::drawPred(int classId, float conf, int left, int top, int right, int bottom, Mat& frame, double &angle)
+bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right, int bottom, Mat& frame, double &angle)
 {
 	float W1 = 88.12453094, W2 = -1.00672202;
 	// BEFORE CUT IMAGE CONTAIN BOUNDING BOX
@@ -214,6 +208,7 @@ bool GuiWindow::drawPred(int classId, float conf, int left, int top, int right, 
 		&& r.x + r.width <= frame.cols
 		&&  r.y + r.height <= frame.rows)
 	{
+		ui->textEdit_Position->append(tr("qua kiem r"));
 		imageCrop = frame(r);
 		//**Convert image from BGR -> Gray**
 		Mat gray;
@@ -265,8 +260,10 @@ bool GuiWindow::drawPred(int classId, float conf, int left, int top, int right, 
 		Mat drawing = Mat::zeros(r.width, r.height, CV_8UC3);
 		if (lines.size() == 0)
 		{
+			ui->textEdit_Position->append(tr("khong qua line size"));
 			return false;
 		}
+		angle = 0;
 		for (size_t i = 0; i < lines.size(); i++)
 		{
 			line(drawing, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0, 0, 255), 1, LINE_8);
@@ -275,9 +272,11 @@ bool GuiWindow::drawPred(int classId, float conf, int left, int top, int right, 
 		angle /= lines.size();
 		angle = W1 + (angle * 180 / CV_PI)*W2;
 		printf(" goc nghieng = %f \r\n  ", angle);
+		ui->textEdit_Position->append(tr("angle: %1 \n").arg(angle));
 		imshow("Object", drawing);
-	return true;
+		return true;
 	}
+	return false;
 }
 
 void GuiWindow::moveJoint(double centerX, double centerY, double Z, double roll)
@@ -322,19 +321,19 @@ void GuiWindow::mousePoints(int event, int x, int y, int flags, void* userdata)
 {
 	if (event == EVENT_LBUTTONDOWN)
 	{
-		x_pos[i] = x;
-		y_pos[i] = y;
+		x_pos[count_mouse] = x;
+		y_pos[count_mouse] = y;
 		cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
-		i++;
-		if (i >= 2)
+		count_mouse++;
+		if (count_mouse >= 2)
 		{
 			flag_ROI = true;
-			i = 0;
+			count_mouse = 0;
 		}
 	}
 }
 
-void GuiWindow::show_Frame(bool dynamic)
+void GuiWindow::showFrame(bool dynamic)
 {
 	if (dynamic)
 	{
@@ -346,13 +345,13 @@ void GuiWindow::show_Frame(bool dynamic)
 			return;
 		}
 		detectObject(frame, out);
-		Size size(260, 200);
+		Size size(640, 480);
 		cv::resize(out, out_resize,size);
-		show_Camera(out_resize, QImage::Format_RGB888);
+		showCamera(out_resize, QImage::Format_RGB888);
 	}
 }
 
-void GuiWindow::show_Camera(cv::Mat img, QImage::Format format)
+void GuiWindow::showCamera(cv::Mat img, QImage::Format format)
 {
 	Mat temp;
 	cvtColor(img, temp, COLOR_BGR2RGB);
@@ -364,7 +363,7 @@ void GuiWindow::show_Camera(cv::Mat img, QImage::Format format)
 
 void GuiWindow::timer_CAM_handle()
 {
-	show_Frame(true);
+	showFrame(true);
 	timer_CAM->start(100);
 }
 
@@ -563,6 +562,10 @@ void GuiWindow::pickAndPlace()
 /*--GUI--*/
 void GuiWindow::gui_init()
 {
+	//Icon
+	ui->pushButton_StartCamera->setIcon(QIcon("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_OFF.JPG"));
+	ui->pushButton_StartCamera->setCheckable(true);
+
 	connect(ui->sliderVelocity, &QAbstractSlider::valueChanged,
 		this, &GuiWindow::slide_Velocity);
 
@@ -618,12 +621,12 @@ void GuiWindow::on_pushButton_StartCamera_toggled(bool checked)
 {
 	if (checked)
 	{
-		ui->pushButton_StartCamera->setIcon(QIcon("/HANH_NHI/final_project/LUAN_VAN/8-7_phucnam/Capture_ON.JPG"));
+		ui->pushButton_StartCamera->setIcon(QIcon("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_ON.JPG"));
 		timer_CAM->start(100);
 	}
 	else
 	{
-		ui->pushButton_StartCamera->setIcon(QIcon("/HANH_NHI/final_project/LUAN_VAN/8-7_phucnam/Capture_OFF.JPG"));	
+		ui->pushButton_StartCamera->setIcon(QIcon("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_OFF.JPG"));	
 		timer_CAM->stop();
 		ui->label_Camera->clear();
 	}
@@ -671,12 +674,12 @@ void GuiWindow::on_pushButton_Hold_clicked()
 
 void GuiWindow::displayPosition(double x, double y, double roll) 
 {
-	ui->textEdit_Position->setText(tr("X: %1 \nY: %2 \nPhi: %3\n").arg(x).arg(y).arg(roll));
+	ui->textEdit_Position->append(tr("X: %1 \nY: %2 \nPhi: %3\n").arg(x).arg(y).arg(roll));
 }
 
 void GuiWindow::getpos()
 {
-	x = last_x;
-	y = last_y;
-	roll = last_roll;
+	//x = last_x;
+	//y = last_y;
+	//roll = last_roll;
 }

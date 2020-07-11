@@ -18,7 +18,6 @@
 #include <string>
 
 
-
 namespace Ui {
 class GuiWindow;
 }
@@ -55,14 +54,16 @@ private:
 	/*--Camera--*/
 	bool detectObject(cv::Mat frame, cv::Mat &out);
 	// Remove the bounding boxes with low confidence using non-maxima suppression
-	void postprocess(cv::Mat& frame, const std::vector<cv::Mat>& outs);
+	void postProcess(cv::Mat& frame, const std::vector<cv::Mat>& outs);
+
 	// Draw the predicted bounding box
-	bool drawPred(int classId, float conf, int left, int top, int right, int bottom, cv::Mat& frame, double &angle);
-	void show_Frame(bool dynamic);
-	void show_Camera(cv::Mat img, QImage::Format format);
+	bool drawPred(int classId, double conf, int left, int top, int right, int bottom, cv::Mat& frame, double &angle);
+	void showFrame(bool dynamic);
+	void showCamera(cv::Mat img, QImage::Format format);
 	// Select ROI
 	void selectROI(cv::Mat frame, cv::Mat &matROI);
 	void displayPosition(double x, double y, double roll);
+
 	/*--Robot--*/
 	void robotInit();
 	void serial_openPort();
@@ -117,7 +118,6 @@ private:
 	bool output_robot;
 	robotPickAndPlace_t state_robot;
 	double x, y, roll;
-	
 };
 
 #endif // GUIWINDOW_H
