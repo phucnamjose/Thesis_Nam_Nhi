@@ -14,13 +14,14 @@ using namespace dnn;
 const char* comboBox_Name[COMBOBOX_NUM] = { "comboBox_Comport","comboBox_Baudrate", };
 
 /*--Robot--*/
-double Zhigh = 100.0;
+double Zhigh = 120.0;
 double Zlow = 45.0;
-double Xplace = 300;
-double Yplace = -120;
+double Xplace = 250;
+double Yplace = -140;
 double roll_place = 0;
 bool isFree = true;
-
+position target;
+int target_success = 0;
 /*--Camera--*/
 vector<String> getOutputsNames(const Net& net);
 extern VideoCapture cap;
@@ -28,7 +29,7 @@ extern Mat blob;
 extern Net net;
 extern vector<string> classes;
 // Network Params
-float confThreshold = 0.7; // Confidence threshold
+float confThreshold = 0.9; // Confidence threshold
 float nmsThreshold = 0.5;  // Non-maximum suppression threshold
 int inpWidth = 416;        // Width of network's input image
 int inpHeight = 416;       // Height of network's input image
@@ -57,12 +58,16 @@ GuiWindow::GuiWindow(QWidget *parent) :
 	// Timer for update position
 	timer_CAM = new QTimer(this);
 	connect(timer_CAM, &QTimer::timeout, this, &GuiWindow::timer_CAM_handle);	
-	
+	// Object
+	object = new Object();
+	timer_OBJECT = new QTimer(this);
+	connect(timer_OBJECT, &QTimer::timeout, this, &GuiWindow::timer_OBJECT_handle);
 }
 
 GuiWindow::~GuiWindow()
 {
     delete ui;
+	delete object;
 }
 
 /*--CAMERA--*/
@@ -86,9 +91,9 @@ bool GuiWindow::detectObject(Mat frame, Mat &out)
 												 //confidence
 		postProcess(matROI, outs); // get outs into frame
 		//imshow("Detect Object", matROI); // show frame to camera window
-		out = matROI.clone();
-		return true;
-	} 
+out = matROI.clone();
+return true;
+	}
 	else
 	{
 		out = frame.clone();
@@ -120,7 +125,7 @@ vector<String>  getOutputsNames(const Net& net)
 void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 {
 	vector<double> X, Y, ANGLE_TRUE, X_TRUE, Y_TRUE;
-	vector<int> classIds;
+	vector<int> classIds, ID_TRUE;
 	vector<float> confidences;
 	vector<Rect> boxes;
 	ui->textEdit_Position->clear();
@@ -154,7 +159,7 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 				double x_absolute = W11 + W21*x_cam + W31*y_cam;
 				double y_absolute = W12 + W22*x_cam + W32*y_cam;
 				printf(" toa do x= %d, y = %d \r\n", x_absolute, y_absolute);
-				
+
 				X.push_back(x_absolute);
 				Y.push_back(y_absolute);
 				classIds.push_back(classIdPoint.x);
@@ -177,15 +182,22 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 		if (drawPred(classIds[idx], confidences[idx], box.x, box.y,
 			box.x + box.width, box.y + box.height, frame, angle))
 		{
+			ID_TRUE.push_back(classIds.at(idx));
 			X_TRUE.push_back(X.at(idx));
 			Y_TRUE.push_back(Y.at(idx));
 			ANGLE_TRUE.push_back(angle);
 		}
 	}
-	ui->textEdit_Position->append(tr("ANGLE size: %1 \n").arg(ANGLE_TRUE.size()));
-	for(int i = 0; i < ANGLE_TRUE.size(); i++) 
+
+	//ui->textEdit_Position->append(tr("ANGLE size: %1 \n").arg(ANGLE_TRUE.size()));
+	if (state_robot == STATE_READY)
 	{
-		displayPosition(X_TRUE.at(i), Y_TRUE.at(i), ANGLE_TRUE.at(i));
+		for (int i = 0; i < ANGLE_TRUE.size(); i++)
+		{
+			displayPosition(X_TRUE.at(i), Y_TRUE.at(i), ANGLE_TRUE.at(i));
+			object->addPosition(ID_TRUE.at(i), X_TRUE.at(i),
+				Y_TRUE.at(i), ANGLE_TRUE.at(i));
+		}
 	}
 }
 
@@ -233,10 +245,11 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		//**Detect edges using canny**
 		Mat canny;
 		Canny(frame_filter, canny, 300, 600, 3);
+		imshow("Canny", canny);
 		
 		//**HoughLines**
 		vector<Vec4i> lines;
-		HoughLinesP(canny, lines, 1, CV_PI / 180, 35, 45, 10);
+		HoughLinesP(canny, lines, 1, CV_PI / 180, 30, 50, 5);
 
 		//**Draw a rectangle displaying the bounding box**
 		rectangle(frame, Point(left, top), Point(right, bottom), Scalar(255, 178, 50), 3);
@@ -253,14 +266,16 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		int baseLine;
 		Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
 		top = max(top, labelSize.height);
-		rectangle(frame, Point(left, top - round(1.5*labelSize.height)), Point(left + round(1.5*labelSize.width), top + baseLine), Scalar(255, 255, 255), FILLED);
-		putText(frame, label, Point(left, top), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 0), 1);
+		rectangle(frame, Point(left, top - round(labelSize.height)), Point(left + round(labelSize.width), top + baseLine), Scalar(255, 255, 255), FILLED);
+		putText(frame, label, Point(left, top), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 0), 1);
 
 		//Calculate arctan
 		Mat drawing = Mat::zeros(r.width, r.height, CV_8UC3);
-		if (lines.size() == 0)
+		ui->textEdit_Position->append(tr("line size: %1 \n").arg(lines.size()));
+		if (lines.size() == 0 || lines.size()>=5)
 		{
-			ui->textEdit_Position->append(tr("khong qua line size"));
+			//ui->textEdit_Position->append(tr("khong qua line size"));
+			ui->textEdit_Position->append(tr("LINESIZELOAI: %1 \n").arg(lines.size()));
 			return false;
 		}
 		angle = 0;
@@ -329,6 +344,7 @@ void GuiWindow::mousePoints(int event, int x, int y, int flags, void* userdata)
 		{
 			flag_ROI = true;
 			count_mouse = 0;
+			destroyAllWindows();
 		}
 	}
 }
@@ -367,6 +383,15 @@ void GuiWindow::timer_CAM_handle()
 	timer_CAM->start(100);
 }
 
+void GuiWindow::timer_OBJECT_handle()
+{
+	if (object->isNotEmpty() && (state_robot == STATE_READY))
+	{
+		object->getPosition(target);
+		connect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
+		pickAndPlace();
+	}
+}
 /*--ROBOT--*/
 void GuiWindow::robotInit() 
 {
@@ -490,15 +515,16 @@ void GuiWindow::pickAndPlace()
 
 		case STATE_PICK:
 			{
-				getpos();
-				controller->robotMoveJoint(x, y, Zhigh, roll);
+				controller->robotMoveJoint(target.x, target.y,
+											Zhigh, target.angle);
 			}
 		break;
 
 
 		case STATE_DOWN1:
 			{
-				controller->robotMoveJoint(x, y, Zlow, roll);
+				controller->robotMoveJoint(target.x, target.y,
+											Zlow, target.angle);
 			}
 		break;
 
@@ -514,7 +540,8 @@ void GuiWindow::pickAndPlace()
 
 		case STATE_UP1:
 			{
-				controller->robotMoveJoint(x, y, Zhigh, roll);
+			controller->robotMoveJoint(target.x, target.y,
+										Zhigh, target.angle);
 			}
 		break;
 
@@ -528,7 +555,7 @@ void GuiWindow::pickAndPlace()
 
 		case STATE_DOWN2:
 			{
-				controller->robotMoveJoint(Xplace, Yplace, Zlow, roll_place);
+				controller->robotMoveJoint(Xplace, Yplace, Zlow + target_success*5.5, roll_place);
 			}
 		break;
 
@@ -551,7 +578,9 @@ void GuiWindow::pickAndPlace()
 
 		case STATE_FINISH:
 			{
+				target_success++;
 				state_robot = STATE_READY;  
+				object->deletePosition(0);
 				disconnect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
 			}
 		break;
@@ -639,18 +668,12 @@ void GuiWindow::on_pushButton_SetROI_clicked()
 	cap >> Select_Window;
 	imshow("Camera", Select_Window);
 	setMouseCallback("Camera", mousePoints, NULL);
-	
 }
 
 
 void GuiWindow::on_pushButton_Pick_clicked()
 {
-	if (state_robot == STATE_READY)
-	{
-		connect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
-		pickAndPlace();
-	}
-	//pick = true;
+	timer_OBJECT->start(200);
 }
 
 void GuiWindow::on_pushButton_Place_clicked()
@@ -675,11 +698,4 @@ void GuiWindow::on_pushButton_Hold_clicked()
 void GuiWindow::displayPosition(double x, double y, double roll) 
 {
 	ui->textEdit_Position->append(tr("X: %1 \nY: %2 \nPhi: %3\n").arg(x).arg(y).arg(roll));
-}
-
-void GuiWindow::getpos()
-{
-	//x = last_x;
-	//y = last_y;
-	//roll = last_roll;
 }

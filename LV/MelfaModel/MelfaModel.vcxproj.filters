@@ -80,6 +80,9 @@
     <ClCompile Include="robotcontroll.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="object_detect.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="guiwindow.h">
@@ -128,5 +131,10 @@
     <QtRcc Include="shaders.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="object_detect.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

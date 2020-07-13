@@ -13,7 +13,7 @@
 #include <robotcontroll.hpp>
 #include <qpixmap.h>
 #include <qimage.h>
-
+#include <object_detect.h>
 
 #include <string>
 
@@ -98,6 +98,7 @@ private slots:
 	bool checkFree();
 	void FreeMCU();
 	void timer_CAM_handle();
+	void timer_OBJECT_handle();
 
 	/*--Robot--*/
 	void serial_updatePortName();                                   // connect timeout timer check
@@ -111,13 +112,15 @@ private:
 	/*--Camera--*/
 	QTimer *timer_CAM;
 	bool	pick = false;
-
+	Object	*object = nullptr;
 	/*--Robot--*/
     RobotControll *controller;
 	QTimer *timer_serial_comboBox = nullptr;
 	bool output_robot;
 	robotPickAndPlace_t state_robot;
-	double x, y, roll;
+
+	/*--ROBOT--*/
+	QTimer *timer_OBJECT;
 };
 
 #endif // GUIWINDOW_H

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>971</width>
+    <width>1218</width>
     <height>597</height>
    </rect>
   </property>
@@ -62,6 +62,11 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_Connect">
+            <property name="styleSheet">
+             <string notr="true">border-width: 1px;
+border-style: solid;
+border-color:darkblue;</string>
+            </property>
             <property name="text">
              <string>Connect</string>
             </property>
@@ -136,6 +141,11 @@
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
             </property>
+            <property name="styleSheet">
+             <string notr="true">border-width: 1px;
+border-style: solid;
+border-color:darkblue;</string>
+            </property>
             <property name="text">
              <string>Home</string>
             </property>
@@ -143,6 +153,11 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_Scan">
+            <property name="styleSheet">
+             <string notr="true">border-width: 1px;
+border-style: solid;
+border-color:darkblue;</string>
+            </property>
             <property name="text">
              <string>Scan</string>
             </property>
@@ -150,6 +165,11 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_Stop">
+            <property name="styleSheet">
+             <string notr="true">border-width: 1px;
+border-style: solid;
+border-color:darkblue;</string>
+            </property>
             <property name="text">
              <string>Stop</string>
             </property>
@@ -176,7 +196,7 @@
          <property name="title">
           <string>Camera</string>
          </property>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>0</x>
@@ -188,6 +208,11 @@
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
             <widget class="QPushButton" name="pushButton_Pick">
+             <property name="styleSheet">
+              <string notr="true">border-width: 1px;
+border-style: solid;
+border-color:darkblue;</string>
+             </property>
              <property name="text">
               <string>PICK</string>
              </property>
@@ -195,6 +220,11 @@
            </item>
            <item>
             <widget class="QPushButton" name="pushButton_Hold">
+             <property name="styleSheet">
+              <string notr="true">border-width: 1px;
+border-style: solid;
+border-color:darkblue;</string>
+             </property>
              <property name="text">
               <string>HOLD</string>
              </property>
@@ -202,6 +232,11 @@
            </item>
            <item>
             <widget class="QPushButton" name="pushButton_Place">
+             <property name="styleSheet">
+              <string notr="true">border-width: 1px;
+border-style: solid;
+border-color:darkblue;</string>
+             </property>
              <property name="text">
               <string>PLACE</string>
              </property>
@@ -229,6 +264,11 @@
            <height>23</height>
           </rect>
          </property>
+         <property name="styleSheet">
+          <string notr="true">border-width: 1px;
+border-style: solid;
+border-color:darkblue;</string>
+         </property>
          <property name="text">
           <string>Select  ROI</string>
          </property>
@@ -237,7 +277,7 @@
          <property name="geometry">
           <rect>
            <x>290</x>
-           <y>0</y>
+           <y>20</y>
            <width>640</width>
            <height>480</height>
           </rect>
@@ -270,10 +310,10 @@
         <widget class="QPushButton" name="pushButton_StartCamera">
          <property name="geometry">
           <rect>
-           <x>480</x>
-           <y>510</y>
-           <width>75</width>
-           <height>23</height>
+           <x>890</x>
+           <y>490</y>
+           <width>41</width>
+           <height>41</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -283,7 +323,7 @@ border:none;
 }</string>
          </property>
          <property name="text">
-          <string>Start Camera</string>
+          <string/>
          </property>
         </widget>
        </widget>

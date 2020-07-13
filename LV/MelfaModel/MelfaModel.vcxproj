@@ -212,10 +212,12 @@
     <ClCompile Include="link6.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="modelloader.cpp" />
+    <ClCompile Include="object_detect.cpp" />
     <ClCompile Include="openglwindow.cpp" />
     <ClCompile Include="robotcontroll.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="object_detect.h" />
     <QtMoc Include="robotcontroll.hpp" />
     <QtMoc Include="guiwindow.h">
     </QtMoc>

@@ -57,7 +57,7 @@ public:
     QPushButton *pushButton_Stop;
     QPushButton *pushButton_TestMoveJoint;
     QGroupBox *groupBox_2;
-    QWidget *widget;
+    QWidget *layoutWidget2;
     QHBoxLayout *horizontalLayout_5;
     QPushButton *pushButton_Pick;
     QPushButton *pushButton_Hold;
@@ -71,7 +71,7 @@ public:
     {
         if (GuiWindow->objectName().isEmpty())
             GuiWindow->setObjectName(QStringLiteral("GuiWindow"));
-        GuiWindow->resize(971, 597);
+        GuiWindow->resize(1218, 597);
         centralwidget = new QWidget(GuiWindow);
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         layoutWidget = new QWidget(centralwidget);
@@ -198,23 +198,23 @@ public:
         groupBox_2 = new QGroupBox(groupBox);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
         groupBox_2->setGeometry(QRect(10, 270, 271, 311));
-        widget = new QWidget(groupBox_2);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(0, 210, 260, 63));
-        horizontalLayout_5 = new QHBoxLayout(widget);
+        layoutWidget2 = new QWidget(groupBox_2);
+        layoutWidget2->setObjectName(QStringLiteral("layoutWidget2"));
+        layoutWidget2->setGeometry(QRect(0, 210, 260, 63));
+        horizontalLayout_5 = new QHBoxLayout(layoutWidget2);
         horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
         horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
-        pushButton_Pick = new QPushButton(widget);
+        pushButton_Pick = new QPushButton(layoutWidget2);
         pushButton_Pick->setObjectName(QStringLiteral("pushButton_Pick"));
 
         horizontalLayout_5->addWidget(pushButton_Pick);
 
-        pushButton_Hold = new QPushButton(widget);
+        pushButton_Hold = new QPushButton(layoutWidget2);
         pushButton_Hold->setObjectName(QStringLiteral("pushButton_Hold"));
 
         horizontalLayout_5->addWidget(pushButton_Hold);
 
-        pushButton_Place = new QPushButton(widget);
+        pushButton_Place = new QPushButton(layoutWidget2);
         pushButton_Place->setObjectName(QStringLiteral("pushButton_Place"));
 
         horizontalLayout_5->addWidget(pushButton_Place);
@@ -225,6 +225,7 @@ public:
         pushButton_SetROI = new QPushButton(groupBox);
         pushButton_SetROI->setObjectName(QStringLiteral("pushButton_SetROI"));
         pushButton_SetROI->setGeometry(QRect(360, 510, 101, 23));
+        pushButton_SetROI->setStyleSheet(QStringLiteral("border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(0, 0, 0, 255), stop:0.33 rgba(0, 0, 0, 255), stop:0.34 rgba(255, 30, 30, 255), stop:0.66 rgba(255, 0, 0, 255), stop:0.67 rgba(255, 255, 0, 255), stop:1 rgba(255, 255, 0, 255));"));
         label_Camera = new QLabel(groupBox);
         label_Camera->setObjectName(QStringLiteral("label_Camera"));
         label_Camera->setGeometry(QRect(290, 0, 640, 480));
@@ -235,7 +236,7 @@ public:
         label_Camera->setLineWidth(5);
         pushButton_StartCamera = new QPushButton(groupBox);
         pushButton_StartCamera->setObjectName(QStringLiteral("pushButton_StartCamera"));
-        pushButton_StartCamera->setGeometry(QRect(480, 510, 75, 23));
+        pushButton_StartCamera->setGeometry(QRect(890, 490, 41, 41));
         pushButton_StartCamera->setStyleSheet(QLatin1String("#pushButton_StartCamera\n"
 "{\n"
 "border:none;\n"
@@ -272,7 +273,7 @@ public:
         pushButton_Place->setText(QApplication::translate("GuiWindow", "PLACE", Q_NULLPTR));
         pushButton_SetROI->setText(QApplication::translate("GuiWindow", "Select  ROI", Q_NULLPTR));
         label_Camera->setText(QString());
-        pushButton_StartCamera->setText(QApplication::translate("GuiWindow", "Start Camera", Q_NULLPTR));
+        pushButton_StartCamera->setText(QString());
     } // retranslateUi
 
 };
