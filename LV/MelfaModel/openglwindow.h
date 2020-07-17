@@ -19,6 +19,7 @@
 #include "link4.h"
 #include "link5.h"
 #include "link6.h"
+#include "box.h"
 
 class QScreen;
 class QTimer;
@@ -37,6 +38,7 @@ public:
     void paintGL();
 
     double degJ[5];
+	void	setAngle(double deg0, double deg1, double deg2, double deg3);
 
 private:
     void mousePressEvent( QMouseEvent *event);
@@ -64,14 +66,14 @@ private:
     QMatrix4x4 m_projection;
 
 private:
-    QOpenGLContext* m_context;
+    QOpenGLContext *m_context;
     QTimer *m_timer;
     Link1 *link1Handle = 0;
     Link2 *link2Handle = 0;
     Link3 *link3Handle = 0;
     Link4 *link4Handle = 0;
     Link5 *link5Handle = 0;
-    //Link6 *link6Handle = 0;
+	Box		*box = 0;
 };
 
 #endif // OPENGLWINDOW_H

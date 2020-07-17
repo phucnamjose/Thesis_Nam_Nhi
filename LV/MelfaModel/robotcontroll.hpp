@@ -166,6 +166,7 @@ private:
             bool    robotReadPosition();
             bool    robotSetting(robotCoordinate_t coordinate, robotTrajectory_t   trajectory);
 
+			bool	isIdle();
             bool    isScan(); //b5 done => co iscan true => moveline ,movej
             double  getX();
             double  getY();
@@ -187,6 +188,7 @@ private:
             int        id_command  = 1;
             bool       istimeout         = false;
 
+			bool		idle = false;
             bool       scan                = false;
             double     x, y, z, roll;
             double     var0, var1, var2, var3;

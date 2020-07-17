@@ -14,6 +14,8 @@
 #include <qpixmap.h>
 #include <qimage.h>
 #include <object_detect.h>
+#include <openglwindow.h>
+
 
 #include <string>
 
@@ -70,7 +72,7 @@ private:
 	void serial_closePort();
 	void fold_Object(double X, double Y, double Z, double angle);
 	void drop_Object(double X, double Y, double Z, double angle);
-	void getpos();
+	double angleProcess(double x, double y, double angle);
 
 public slots:
 	static void mousePoints(int event, int x, int y, int flags, void* userdata);
@@ -85,9 +87,7 @@ private slots:
 	void on_pushButton_Stop_clicked();
 	void on_pushButton_StartCamera_toggled(bool checked);
 	void on_pushButton_SetROI_clicked();
-	void on_pushButton_Pick_clicked();
-	void on_pushButton_Place_clicked();
-	void on_pushButton_Hold_clicked();
+	void on_pushButton_Start_clicked();
 	void slide_Velocity();
 	void slide_Accelerate();
 	
@@ -105,10 +105,13 @@ private slots:
 	void serial_updateSetting();                                    // connect current text change
 	void serial_handleError(QSerialPort::SerialPortError error);    // connect error handle
 	void pickAndPlace();
+	void overWorkSpace();
+	void timer_PAIN_handle();
+	void timer_IDLE_handle();
 private:
 	/*--GUI--*/
     Ui::GuiWindow *ui;
-
+	OpenGLWindow *openGLWindow;
 	/*--Camera--*/
 	QTimer *timer_CAM;
 	bool	pick = false;
@@ -117,10 +120,14 @@ private:
     RobotControll *controller;
 	QTimer *timer_serial_comboBox = nullptr;
 	bool output_robot;
-	robotPickAndPlace_t state_robot;
+	robotPickAndPlace_t state_robot = STATE_READY;
 
 	/*--ROBOT--*/
 	QTimer *timer_OBJECT;
+	QTimer *timer_PAIN;
+	QTimer *timer_IDLE;
+	bool idle_robot = false;
+
 };
 
 #endif // GUIWINDOW_H

@@ -203,6 +203,7 @@
     </QtUic>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="box.cpp" />
     <ClCompile Include="guiwindow.cpp" />
     <ClCompile Include="link1.cpp" />
     <ClCompile Include="link2.cpp" />
@@ -217,6 +218,7 @@
     <ClCompile Include="robotcontroll.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="box.h" />
     <ClInclude Include="object_detect.h" />
     <QtMoc Include="robotcontroll.hpp" />
     <QtMoc Include="guiwindow.h">

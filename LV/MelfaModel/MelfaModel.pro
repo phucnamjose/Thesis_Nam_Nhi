@@ -16,8 +16,8 @@ SOURCES += main.cpp \
     link4.cpp \
     link5.cpp \
     link6.cpp \
-    guiwindow.cpp
-
+    guiwindow.cpp\
+	box.cpp
 HEADERS += \
     modelloader.h \
     openglwindow.h \
@@ -27,7 +27,8 @@ HEADERS += \
     link4.h \
     link5.h \
     link6.h \
-    guiwindow.h
+    guiwindow.h\
+	box.h
 
 RESOURCES += \
     shaders.qrc

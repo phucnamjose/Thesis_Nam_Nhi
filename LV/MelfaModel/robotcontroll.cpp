@@ -116,6 +116,7 @@ bool   RobotControll::processRespond(QByteArray &repsond) {
         respond_code += list.at(1);
         // IDLE
         if (respond_code == ROBOTRESPOND[RPD_IDLE]) {
+			idle = true;
             if (list.at(2).toInt() == 1) {  scan = true;}
             else if (list.at(2).toInt() == 0) {  scan = false;}
             // Send Signal
@@ -123,6 +124,7 @@ bool   RobotControll::processRespond(QByteArray &repsond) {
 
         // BUSY
         } else if (respond_code == ROBOTRESPOND[RPD_BUSY]) {
+			idle = false;
             if (list.at(2).toInt() == 1) {  scan = true;}
             else if (list.at(2).toInt() == 0) {  scan = false;}
             // Send Signal
@@ -159,12 +161,12 @@ bool   RobotControll::processRespond(QByteArray &repsond) {
         // ERRO
         } else if (respond_code == ROBOTRESPOND[RPD_ERROR]) {
             // Send Signal
-            emit respondArrived(repsond);
+            emit commandDeny(repsond);
 
         // OKEY
         } else if (respond_code == ROBOTRESPOND[RPD_OK]) {
             // Send Signal
-            emit respondArrived(repsond);
+            emit commandAccept(repsond);
 
         // WRONG FRAME
         } else {
@@ -493,7 +495,9 @@ double RobotControll:: getTimeRun() {
     return time_run;
 }
 
-/*void RobotControll:: commandTimeOut()
+
+bool RobotControll::isIdle()
 {
-	 this->StartDone= true;
-}*/
+	robotReadStatus();
+	return idle;
+}

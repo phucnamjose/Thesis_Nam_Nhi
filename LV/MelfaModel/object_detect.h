@@ -29,6 +29,7 @@ public:
 	bool		getPosition(position &get_point);
 	bool		deletePosition(int num_id);
 	bool		isNotEmpty();
+	void		clear();
 private:
 	QList <position> list_position;
 };

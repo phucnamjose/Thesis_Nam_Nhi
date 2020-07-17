@@ -176,7 +176,7 @@ void Link5::my_paintGL(int w_xRot, int w_yRot, int w_zRot, float w_scale, QMatri
 
     // Calculate DH matrix
     //double d1 = 0.3f, a2 = 0.25f, a3 = 0.16f;
-    double L2 = 0.16f,L1 = 0.197f,alpha = 0.0f,d1 = 0.2275,d3=0.11;
+    double L2 = 0.16f,L1 = 0.197f,alpha = 0.0f,d1 = 0.211,d3=0.083;
     degJ1 = qDegreesToRadians(degJ1);
     degJ2 = qDegreesToRadians(degJ2);
     //degJ3 = qDegreesToRadians(degJ3);

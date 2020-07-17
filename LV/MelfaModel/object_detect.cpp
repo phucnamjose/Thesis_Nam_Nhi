@@ -73,3 +73,8 @@ bool Object :: isNotEmpty()
 		return false;
 	}
 }
+
+void	Object::clear()
+{
+	list_position.clear();
+}

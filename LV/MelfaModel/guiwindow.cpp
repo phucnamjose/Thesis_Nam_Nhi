@@ -15,13 +15,17 @@ const char* comboBox_Name[COMBOBOX_NUM] = { "comboBox_Comport","comboBox_Baudrat
 
 /*--Robot--*/
 double Zhigh = 120.0;
-double Zlow = 45.0;
-double Xplace = 250;
-double Yplace = -140;
-double roll_place = 0;
+double Zlow = 44.0;
+double Xplace = 240;
+double Yplace = -170;
+double roll_place = -90;
+double roll_pick;
 bool isFree = true;
 position target;
-int target_success = 0;
+int collum_jp = 0;
+int collum_vn = 0;
+int target_success_jp = 0;
+int target_success_vn = 0;
 /*--Camera--*/
 vector<String> getOutputsNames(const Net& net);
 extern VideoCapture cap;
@@ -48,6 +52,7 @@ int last_x, last_y, last_roll;
 // Get the names of the output layers
 GuiWindow::GuiWindow(QWidget *parent) :
     ui(new Ui::GuiWindow)
+	//openGLWindow(new OpenGLWindow)
 {
     ui->setupUi(this);
 
@@ -62,6 +67,12 @@ GuiWindow::GuiWindow(QWidget *parent) :
 	object = new Object();
 	timer_OBJECT = new QTimer(this);
 	connect(timer_OBJECT, &QTimer::timeout, this, &GuiWindow::timer_OBJECT_handle);
+	timer_IDLE = new QTimer(this);
+	connect(timer_OBJECT, &QTimer::timeout, this, &GuiWindow::timer_IDLE_handle);
+	// Pain
+	timer_PAIN = new QTimer(this);
+	connect(timer_PAIN, &QTimer::timeout, this, &GuiWindow::timer_PAIN_handle);
+	
 }
 
 GuiWindow::~GuiWindow()
@@ -128,7 +139,6 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 	vector<int> classIds, ID_TRUE;
 	vector<float> confidences;
 	vector<Rect> boxes;
-	ui->textEdit_Position->clear();
 	//ui->textEdit_Position->append(tr("Outsize: %1 \n").arg(outs.size()));
 	for (size_t i = 0; i < outs.size(); ++i)
 	{
@@ -173,7 +183,7 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 	//boxes with lower confidences
 	vector<int> indices;
 	NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
-	//ui->textEdit_Position->append(tr("Indices size: %1 \n").arg(indices.size()));
+	
 	for (size_t i = 0; i < indices.size(); ++i)
 	{
 		double angle;
@@ -183,18 +193,17 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 			box.x + box.width, box.y + box.height, frame, angle))
 		{
 			ID_TRUE.push_back(classIds.at(idx));
+			//ui->textEdit_Position->append(tr("ID CLASS: %1 \n").arg(classIds.at(idx)));
 			X_TRUE.push_back(X.at(idx));
 			Y_TRUE.push_back(Y.at(idx));
 			ANGLE_TRUE.push_back(angle);
 		}
 	}
 
-	//ui->textEdit_Position->append(tr("ANGLE size: %1 \n").arg(ANGLE_TRUE.size()));
 	if (state_robot == STATE_READY)
 	{
 		for (int i = 0; i < ANGLE_TRUE.size(); i++)
 		{
-			displayPosition(X_TRUE.at(i), Y_TRUE.at(i), ANGLE_TRUE.at(i));
 			object->addPosition(ID_TRUE.at(i), X_TRUE.at(i),
 				Y_TRUE.at(i), ANGLE_TRUE.at(i));
 		}
@@ -208,10 +217,10 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 	// BEFORE CUT IMAGE CONTAIN BOUNDING BOX
 	Mat imageCrop;
 	Rect2d r;
-	r.x = left - 10;
-	r.y = top - 10;
-	r.width = right - left + 20;  //right-left is %d //r.width  is float 
-	r.height = bottom - top + 20;
+	r.x = left;
+	r.y = top;
+	r.width = right - left;  //right-left is %d //r.width  is float 
+	r.height = bottom - top;
 
 	if (r.x >= 0
 		&& r.y >= 0
@@ -220,12 +229,12 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		&& r.x + r.width <= frame.cols
 		&&  r.y + r.height <= frame.rows)
 	{
-		ui->textEdit_Position->append(tr("qua kiem r"));
+		//ui->textEdit_Position->append(tr("qua kiem r"));
 		imageCrop = frame(r);
-		//**Convert image from BGR -> Gray**
+		//**Convert image from BGR -> HSV**
 		Mat gray;
 		cvtColor(imageCrop, gray, COLOR_BGR2GRAY);
-		
+
 		//**Threshold**
 		Mat frame_threshold;
 		int max_value = 255;  
@@ -271,11 +280,9 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 
 		//Calculate arctan
 		Mat drawing = Mat::zeros(r.width, r.height, CV_8UC3);
-		ui->textEdit_Position->append(tr("line size: %1 \n").arg(lines.size()));
-		if (lines.size() == 0 || lines.size()>=5)
+		//ui->textEdit_Position->append(tr("line size: %1 \n").arg(lines.size()));
+		if (lines.size() == 0 )
 		{
-			//ui->textEdit_Position->append(tr("khong qua line size"));
-			ui->textEdit_Position->append(tr("LINESIZELOAI: %1 \n").arg(lines.size()));
 			return false;
 		}
 		angle = 0;
@@ -286,8 +293,9 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		}
 		angle /= lines.size();
 		angle = W1 + (angle * 180 / CV_PI)*W2;
-		printf(" goc nghieng = %f \r\n  ", angle);
-		ui->textEdit_Position->append(tr("angle: %1 \n").arg(angle));
+		ui->textEdit_Position->setText(tr("angle: %1 \n").arg(angle));
+		namedWindow("Object");
+		resizeWindow("Object", 200, 200);
 		imshow("Object", drawing);
 		return true;
 	}
@@ -361,7 +369,7 @@ void GuiWindow::showFrame(bool dynamic)
 			return;
 		}
 		detectObject(frame, out);
-		Size size(640, 480);
+		Size size(260, 200);
 		cv::resize(out, out_resize,size);
 		showCamera(out_resize, QImage::Format_RGB888);
 	}
@@ -380,7 +388,7 @@ void GuiWindow::showCamera(cv::Mat img, QImage::Format format)
 void GuiWindow::timer_CAM_handle()
 {
 	showFrame(true);
-	timer_CAM->start(100);
+	timer_CAM->start(500);
 }
 
 void GuiWindow::timer_OBJECT_handle()
@@ -389,6 +397,7 @@ void GuiWindow::timer_OBJECT_handle()
 	{
 		object->getPosition(target);
 		connect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
+		connect(controller, &RobotControll::commandDeny, this, &GuiWindow::overWorkSpace);
 		pickAndPlace();
 	}
 }
@@ -515,8 +524,27 @@ void GuiWindow::pickAndPlace()
 
 		case STATE_PICK:
 			{
+				if (target.class_id == 0)
+				{
+					ui->textEdit_Position->append(tr("JAPAN"));
+				}
+				else
+				{
+					ui->textEdit_Position->append(tr("VIETNAM"));
+				}
+				displayPosition(target.x, target.y, target.angle);
+				roll_pick = angleProcess(target.x, target.y, target.angle);
+				ui->textEdit_Position->append(tr("roll pick: %1 \n").arg(roll_pick));
+				if (roll_pick > 0)
+				{
+					roll_place = 90;
+				}
+				else
+				{
+					roll_place = -90;
+				}
 				controller->robotMoveJoint(target.x, target.y,
-											Zhigh, target.angle);
+											Zhigh, roll_pick);
 			}
 		break;
 
@@ -524,7 +552,7 @@ void GuiWindow::pickAndPlace()
 		case STATE_DOWN1:
 			{
 				controller->robotMoveJoint(target.x, target.y,
-											Zlow, target.angle);
+											Zlow, roll_pick);
 			}
 		break;
 
@@ -541,21 +569,36 @@ void GuiWindow::pickAndPlace()
 		case STATE_UP1:
 			{
 			controller->robotMoveJoint(target.x, target.y,
-										Zhigh, target.angle);
+										Zhigh, roll_pick);
 			}
 		break;
 
 
 		case STATE_PLACE:
-			{
-				controller->robotMoveJoint(Xplace, Yplace, Zhigh, roll_place);
+			{	
+				if (target.class_id == 0)
+				{	
+					controller->robotMoveJoint(Xplace , Yplace, Zhigh, roll_place);
+				}
+				else
+				{
+					controller->robotMoveJoint(Xplace + 50 , Yplace, Zhigh, roll_place);
+				}
+				
 			}
 		break;
 
 
 		case STATE_DOWN2:
 			{
-				controller->robotMoveJoint(Xplace, Yplace, Zlow + target_success*5.5, roll_place);
+				if (target.class_id == 0)
+				{	
+					controller->robotMoveJoint(Xplace , Yplace, Zlow + 5.5* target_success_jp, roll_place);
+				}
+				else
+				{
+					controller->robotMoveJoint(Xplace +50 , Yplace, Zlow + 5.5* target_success_vn, roll_place);
+				}		
 			}
 		break;
 
@@ -571,28 +614,86 @@ void GuiWindow::pickAndPlace()
 
 		case STATE_UP2:
 			{
-				controller->robotMoveJoint(Xplace, Yplace, Zhigh, roll_place);
+				if (target.class_id == 0)
+				{
+					controller->robotMoveJoint(Xplace , Yplace, Zhigh, roll_place);
+				}
+				else
+				{
+					controller->robotMoveJoint(Xplace +50 , Yplace, Zhigh, roll_place);
+				}	
 			}
 		break;
 
 
 		case STATE_FINISH:
 			{
-				target_success++;
+				if (target.class_id == 0)
+				{
+					target_success_jp++;
+					if (target_success_jp == 5)
+					{
+						ui->textEdit_Waring->append("WARNING: Exceeding the height of Japan bundle");
+						target_success_jp = 0;
+					}	
+				}
+				else
+				{
+					target_success_vn++;
+					if (target_success_vn == 5)
+					{
+						ui->textEdit_Waring->append("WARNING: Exceeding the height of Viet Nam bundle");
+						target_success_vn = 0;
+					}
+				}
 				state_robot = STATE_READY;  
 				object->deletePosition(0);
 				disconnect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
+
 			}
 		break;
 		default: {}
 	}
 }
 
+void GuiWindow::overWorkSpace()
+{
+	ui->textEdit_Inform->insertPlainText("ERROR: Over workspace");
+	ui->textEdit_Inform->insertPlainText("Skip Point:");
+	ui->textEdit_Inform->insertPlainText(tr("X: %1\n Y: %2\n Phi: %3\n")
+							.arg(target.x).arg(target.y).arg(target.angle));
+	object->deletePosition(0);
+	disconnect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
+	state_robot = STATE_READY;
+}
+
+double GuiWindow::angleProcess(double x, double y, double angle)
+{
+	if (x > 250 && fabs(angle) > 90) 
+	{
+		if (angle > 0)
+		{
+			return (angle - 180);
+		}
+		else
+		{
+			return (180 + angle);
+		}
+	}
+	else
+	{
+		return angle;
+	}
+}
 /*--GUI--*/
 void GuiWindow::gui_init()
 {
+	ui->textEdit_Inform->ensureCursorVisible();
+
 	//Icon
-	ui->pushButton_StartCamera->setIcon(QIcon("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_OFF.JPG"));
+	QIcon Off("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_OFF.JPG");
+	ui->pushButton_StartCamera->setIcon(Off);
+	ui->pushButton_StartCamera->setIconSize(QSize(20, 20));
 	ui->pushButton_StartCamera->setCheckable(true);
 
 	connect(ui->sliderVelocity, &QAbstractSlider::valueChanged,
@@ -617,52 +718,71 @@ void GuiWindow::slide_Accelerate()
 
 void GuiWindow::on_pushButton_Connect_clicked()
 {
-	if (ui->pushButton_Connect->text() == "Connect") {
+	if (ui->pushButton_Connect->text() == "Connect")
+	{ 
+		ui->textEdit_Waring->setText("WARNING: Robot is connecting");
 		serial_openPort();
 	}
-	else {
+	else 
+	{
+		ui->textEdit_Waring->setText("WARNING: Robot is disconnecting");
 		serial_closePort();
 	}
 }
 
 void GuiWindow::on_pushButton_Scan_clicked()
 {
+	ui->textEdit_Waring->setText("WARNING: Robot is scanning");
 	controller->robotScanLimit();
 }
 
 void GuiWindow::on_pushButton_TestMoveJoint_clicked() 
 {
-	controller->robotMoveJoint(250, 0, 100, 0);
+	timer_PAIN->start(400);
 }
 
 void GuiWindow::on_pushButton_Home_clicked()
-{
+{ 
+	ui->textEdit_Waring->setText("WARNING: Robot is at home status");
+	state_robot = STATE_READY;
+	target_success_jp = 0;
+	target_success_vn = 0;
+	collum_jp = 0;
+	collum_vn = 0;
+	timer_OBJECT->stop();
+	timer_IDLE->stop();
+	object->clear();
+	controller->robotOutput(false);
 	controller->robotMoveHome();
 }
 
 void  GuiWindow::on_pushButton_Stop_clicked()
-{   //XXXXXXXXXXXXXXXXX
-	controller->setAccelerate(0);
-	controller->setAccelerate(0);
+{
+	ui->textEdit_Waring->setText("WARNING: Robot is stopping");
+	timer_OBJECT->stop();
 }
 
 void GuiWindow::on_pushButton_StartCamera_toggled(bool checked)
 {
 	if (checked)
 	{
-		ui->pushButton_StartCamera->setIcon(QIcon("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_ON.JPG"));
-		timer_CAM->start(100);
+		QIcon On("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_ON.JPG");
+		ui->pushButton_StartCamera->setIcon(On);
+		ui->pushButton_StartCamera->setIconSize(QSize(20, 20));
+		timer_CAM->start(500);
 	}
 	else
 	{
-		ui->pushButton_StartCamera->setIcon(QIcon("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_OFF.JPG"));	
+		QIcon Off("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_OFF.JPG");
+		ui->pushButton_StartCamera->setIcon(Off);
+		ui->pushButton_StartCamera->setIconSize(QSize(20, 20));
 		timer_CAM->stop();
 		ui->label_Camera->clear();
 	}
 }
 
 void GuiWindow::on_pushButton_SetROI_clicked()
-{
+{	
 	flag_ROI = false;
 	Mat Select_Window;
 	cap >> Select_Window;
@@ -670,32 +790,33 @@ void GuiWindow::on_pushButton_SetROI_clicked()
 	setMouseCallback("Camera", mousePoints, NULL);
 }
 
-
-void GuiWindow::on_pushButton_Pick_clicked()
+void GuiWindow::on_pushButton_Start_clicked()
 {
+	ui->textEdit_Waring->setText("WARNING: Robot is starting");
 	timer_OBJECT->start(200);
-}
-
-void GuiWindow::on_pushButton_Place_clicked()
-{
-	controller->robotMoveJoint(300, -125, 45, 0);
-}
-
-void GuiWindow::on_pushButton_Hold_clicked()
-{
-	output_robot = !output_robot;
-	controller->robotOutput(output_robot);
-	if (output_robot) {
-		ui->pushButton_Hold->setText("DROP");
-	}
-	else
-	{
-		ui->pushButton_Hold->setText("HOLD");
-	}
-
+	timer_IDLE->start(100);	
 }
 
 void GuiWindow::displayPosition(double x, double y, double roll) 
 {
-	ui->textEdit_Position->append(tr("X: %1 \nY: %2 \nPhi: %3\n").arg(x).arg(y).arg(roll));
+	ui->textEdit_Position->append(tr("X: %1 \nY: %2 \nPhi: %3").arg(x).arg(y).arg(roll));
+}
+
+void GuiWindow::timer_PAIN_handle()
+{
+	{
+		double deg0, deg1, deg2, deg3;
+		deg0 = controller->getVar0();
+		deg1 = controller->getVar1();
+		deg2 = controller->getVar2();
+		deg3 = controller->getVar3();
+		openGLWindow->setAngle(deg0, deg1, deg2, deg3);
+		ui->textEdit_Inform->clear();
+		ui->textEdit_Inform->append(tr("%1 %2 %3 %4").arg(deg0).arg(deg1).arg(deg2).arg(deg3));
+	}
+}
+
+void GuiWindow::timer_IDLE_handle()
+{
+	idle_robot = controller->isIdle();
 }

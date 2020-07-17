@@ -7,14 +7,14 @@
 #include <QDebug>
 
 OpenGLWindow::OpenGLWindow(QWidget *parent):
-    QOpenGLWidget(parent)
-    , m_context(0)
+    //QOpenGLWidget(parent)
+     m_context(0)
     , m_timer(0)
     , m_xRot(0)
     , m_yRot(0)
     , m_zRot(0)
     , m_scale(1.0f)
-    , degJ{0,0,0,0,0}
+    , degJ{-35.9, 72.2, 0.861, 5.4, 0}
 {
     m_context = createOpenGLContext(3, 3);
 
@@ -37,12 +37,12 @@ void OpenGLWindow::initializeGL()
 {
     glEnable(GL_DEPTH_TEST);
     glClearColor(.9f, .9f, .93f ,1.0f);
-
     link1Handle = new Link1();
     link2Handle = new Link2();
     link3Handle = new Link3();
     link4Handle = new Link4();
     link5Handle = new Link5();
+
     //link6Handle = new Link6();
 }
 
@@ -67,7 +67,7 @@ void OpenGLWindow::paintGL()
 //    static int ii;
 //    qDebug() << ii++;
 
-   //link1Handle->my_paintGL(m_xRot, m_yRot, m_zRot, m_scale, m_projection);
+   link1Handle->my_paintGL(m_xRot, m_yRot, m_zRot, m_scale, m_projection);
    link2Handle->my_paintGL(m_xRot, m_yRot, m_zRot, m_scale, m_projection, degJ[0]);
    link3Handle->my_paintGL(m_xRot, m_yRot, m_zRot, m_scale, m_projection, degJ[0], degJ[1]);
    link4Handle->my_paintGL(m_xRot, m_yRot, m_zRot, m_scale, m_projection, degJ[0], degJ[1], degJ[2]);
@@ -162,4 +162,13 @@ void OpenGLWindow::scalePlus()
 void OpenGLWindow::scaleMinus()
 {
     m_scale /= 1.1f;
+}
+
+void OpenGLWindow::setAngle(double deg0, double deg1, double deg2, double deg3)
+{
+	degJ[0] = deg0;
+	degJ[1] = deg1;
+	degJ[2] = -deg2/100;
+	degJ[3] = deg3;
+	//paintGL();
 }

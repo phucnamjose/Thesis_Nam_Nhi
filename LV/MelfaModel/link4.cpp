@@ -177,7 +177,7 @@ void Link4::my_paintGL(int w_xRot, int w_yRot, int w_zRot, float w_scale, QMatri
 
     // Calculate DH matrix
     /*double d1 = 0.3f, a2 = 0.25f, a3 = 0.16f;*/
-    double L2 = 0.16f,L1 = 0.197f,alpha = 0.0f,d1 = 0.2275,d3=0.11;
+    double L2 = 0.16f,L1 = 0.197f, alpha = 0.0f, d1 = 0.211, d3=0.083;
     degJ1 = qDegreesToRadians(degJ1);
     degJ2 = qDegreesToRadians(degJ2);
     /*degJ3 = qDegreesToRadians(degJ3)*/;
@@ -185,7 +185,7 @@ void Link4::my_paintGL(int w_xRot, int w_yRot, int w_zRot, float w_scale, QMatri
 
     double c1 = cos(degJ1), s1 = sin(degJ1);
     double c2 = cos(degJ2), s2 = sin(degJ2);
-    double c23 = cos(degJ2 + degJ3), s23 = sin(degJ2 + degJ3);
+    //double c23 = cos(degJ2 + degJ3), s23 = sin(degJ2 + degJ3);
     /*m_DH = QMatrix4x4( c1*s23, c1*c23, -s1, c1*(a2*s2 + a3*s23),
                        s1*s23, c23*s1,  c1, s1*(a2*s2 + a3*s23),
                           c23,   -s23,   0, d1 + a2*c2 + a3*c23,
