@@ -199,6 +199,37 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 			ANGLE_TRUE.push_back(angle);
 		}
 	}
+	if (ANGLE_TRUE.size() == 1)
+	{
+		if (k == 0)
+		{
+			timer_TRACKING.start();
+		}
+		curent_X = X_TRUE.at(0);
+		curent_Y = Y_TRUE.at(0);
+		curent_T = timer_TRACKING.elapsed();
+
+		if (k == 2)
+		{
+			Point0_X = curent_X;
+			Point0_Y = curent_Y;
+		}
+
+		if (k >= 2)
+		{
+			V_x = fabs((curent_X - last_X) / ((curent_T - last_T)*0.001));
+			V_y = fabs((curent_Y - last_Y) / ((curent_T - last_T)*0.001));
+		}
+
+		//----------------update---------
+		k++;
+		last_X = curent_X;
+		last_Y = curent_Y;
+		last_T = curent_T;
+	}
+
+	Point1_X = Point0_X + V_x*0.2;
+	Point1_Y = Point0_Y + V_y*0.2;
 
 	if (state_robot == STATE_READY)
 	{
@@ -217,10 +248,10 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 	// BEFORE CUT IMAGE CONTAIN BOUNDING BOX
 	Mat imageCrop;
 	Rect2d r;
-	r.x = left;
-	r.y = top;
-	r.width = right - left;  //right-left is %d //r.width  is float 
-	r.height = bottom - top;
+	r.x = left - 10;
+	r.y = top - 10;
+	r.width = right - left + 20;  //right-left is %d //r.width  is float 
+	r.height = bottom - top + 20;
 
 	if (r.x >= 0
 		&& r.y >= 0
@@ -258,7 +289,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		
 		//**HoughLines**
 		vector<Vec4i> lines;
-		HoughLinesP(canny, lines, 1, CV_PI / 180, 30, 50, 5);
+		HoughLinesP(canny, lines, 1, CV_PI / 180, 30, 50, 10);
+		ui->textEdit_Position->append(tr("line : %1 \n  ").arg(lines.size()));
 
 		//**Draw a rectangle displaying the bounding box**
 		rectangle(frame, Point(left, top), Point(right, bottom), Scalar(255, 178, 50), 3);
@@ -280,42 +312,108 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 
 		//Calculate arctan
 		Mat drawing = Mat::zeros(r.width, r.height, CV_8UC3);
-		//ui->textEdit_Position->append(tr("line size: %1 \n").arg(lines.size()));
+		angle = 0;
+
 		if (lines.size() == 0 )
 		{
 			return false;
 		}
-		angle = 0;
+		
+		if (lines.size() >= 2)
+		{
+			vector<Vec3f> params(4);
+			for (size_t i = 0; i < lines.size(); i++)
+			{
+				params.push_back(calcParams(Point(lines[i][0], lines[i][1]),
+											Point(lines[i][2], lines[i][3])));
+			}
+
+			vector<Point> corners;
+			for (int i = 0; i < params.size(); i++)
+			{
+				for (int j = i; j < params.size(); j++)
+				{
+					Point intersec = findIntersection(params[i], params[j]);
+					if ((intersec.x > 0)
+						&& (intersec.y > 0)
+						&& (intersec.x < canny.cols)
+						&& (intersec.y < canny.rows))
+					{
+						corners.push_back(intersec);
+					}
+				}
+			}
+
+			for (int i = 0; i < corners.size(); i++)
+			{
+				circle(drawing, corners[i], 3, Scalar(0, 255, 0));
+			}
+
+			if (corners.size() != 0)
+			{
+				return false;
+			}
+		}
 		for (size_t i = 0; i < lines.size(); i++)
 		{
-			line(drawing, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0, 0, 255), 1, LINE_8);
+			line(drawing, Point(lines[i][0], lines[i][1]),
+				Point(lines[i][2], lines[i][3]), Scalar(0, 0, 255), 1, LINE_8);
 			angle += atan2((double)lines[i][3] - lines[i][1], (double)lines[i][2] - lines[i][0]);
 		}
 		angle /= lines.size();
 		angle = W1 + (angle * 180 / CV_PI)*W2;
 		ui->textEdit_Position->setText(tr("angle: %1 \n").arg(angle));
-		namedWindow("Object");
-		resizeWindow("Object", 200, 200);
 		imshow("Object", drawing);
-		return true;
+		return true;	
 	}
 	return false;
 }
+
+Vec3f GuiWindow::calcParams(Point2f p1, Point2f p2)
+{
+	float a, b, c;
+	if (p2.y - p1.y == 0)
+	{
+		a = 0.0f;
+		b = -1.0f;
+	}
+	else if (p2.x - p1.x == 0)
+	{
+		a = -1.0f;
+		b = 0.0f;
+	}
+	else
+	{
+		a = (p2.y - p1.y) / (p2.x - p1.x);
+		b = -1.0f;
+	}
+
+	c = (-a * p1.x) - b * p1.y;
+	return(Vec3f(a, b, c));
+}
+
+Point  GuiWindow::findIntersection(Vec3f params1, Vec3f params2)
+{
+	float x = -1, y = -1;
+	float det = params1[0] * params2[1] - params2[0] * params1[1];
+	if (det < 0.5f && det > -0.5f) // lines are approximately parallel
+	{
+		return(Point(-1, -1));
+	}
+	else
+	{
+		x = (params2[1] * -params1[2] - params1[1] * -params2[2]) / det;
+		y = (params1[0] * -params2[2] - params2[0] * -params1[2]) / det;
+	}
+	return(Point(x, y));
+}
+
 
 void GuiWindow::moveJoint(double centerX, double centerY, double Z, double roll)
 {
 	controller->robotMoveJoint(centerX, centerY, Z, roll);
 }
 
-bool GuiWindow::checkFree()
-{
-	return isFree;
-}
-
-void GuiWindow::FreeMCU()
-{
-	isFree = true;
-}
 
 void GuiWindow::selectROI(Mat frame, Mat &matROI)
 {
@@ -414,10 +512,7 @@ void GuiWindow::robotInit()
 		connect(this->findChild<QComboBox*>(comboBox_Name[i]), &QComboBox::currentTextChanged,
 			this, &GuiWindow::serial_updateSetting, Qt::QueuedConnection);
 	}
-	//connect(ui->pushButton_LogsClear, &QPushButton::clicked, this, &GuiWindow::logs_clear);
-	//connect(ui->pushButton_Request, &QPushButton::clicked, this, &GuiWindow::manual_checkPara_setCommand);
-	//connect(serial, &RobotControll::commandSend, this, &GuiWindow::serial_logCommand);
-
+	
 	timer_serial_comboBox = new QTimer(this);
 	connect(timer_serial_comboBox, &QTimer::timeout, this, &GuiWindow::serial_updatePortName);
 	timer_serial_comboBox->start(1000);
@@ -482,7 +577,6 @@ void GuiWindow::serial_updateSetting() {
 	controller->setParity(QSerialPort::NoParity);
 	controller->setStopBits(QSerialPort::OneStop);
 	controller->setFlowControl(QSerialPort::NoFlowControl);
-	//qDebug() << controller->portName() << controller->baudRate();
 }
 
 void GuiWindow::serial_handleError(QSerialPort::SerialPortError error)
@@ -491,29 +585,6 @@ void GuiWindow::serial_handleError(QSerialPort::SerialPortError error)
 		QMessageBox::critical(this, tr("Critical Error"), controller->errorString());
 		serial_closePort();
 	}
-}
-
-void GuiWindow::fold_Object(double X, double Y, double Z, double angle)
-{  
-	/*if (
-	{  moveJoint(X, Y, Zhigh, angle);
-		for ( int i=0;i<=40;i=i+4)
-		{
-			moveJoint(X, Y, i, angle);
-		}
-	}*/
-}
-
-void GuiWindow::drop_Object(double X, double Y, double Z, double angle)
-{
-	/*if (controller->robotReadStatus)
-	{
-		for (int i = 0; i <= 40; i = i + 4)
-		{
-			moveJoint(X, Y, i, angle);
-		}
-	}*/
-
 }
 
 void GuiWindow::pickAndPlace()

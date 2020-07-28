@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QtSerialPort/QSerialPort>
 #include <QMessageBox>
 #include <opencv2/opencv.hpp>
@@ -15,10 +16,11 @@
 #include <qimage.h>
 #include <object_detect.h>
 #include <openglwindow.h>
-
-
 #include <string>
 
+using namespace cv;
+using namespace std;
+using namespace dnn;
 
 namespace Ui {
 class GuiWindow;
@@ -62,6 +64,9 @@ private:
 	bool drawPred(int classId, double conf, int left, int top, int right, int bottom, cv::Mat& frame, double &angle);
 	void showFrame(bool dynamic);
 	void showCamera(cv::Mat img, QImage::Format format);
+	Vec3f calcParams(Point2f p1, Point2f p2);
+	Point findIntersection(Vec3f params1, Vec3f params2);
+
 	// Select ROI
 	void selectROI(cv::Mat frame, cv::Mat &matROI);
 	void displayPosition(double x, double y, double roll);
@@ -70,8 +75,6 @@ private:
 	void robotInit();
 	void serial_openPort();
 	void serial_closePort();
-	void fold_Object(double X, double Y, double Z, double angle);
-	void drop_Object(double X, double Y, double Z, double angle);
 	double angleProcess(double x, double y, double angle);
 
 public slots:
@@ -95,8 +98,6 @@ private slots:
 	/*--Camera--*/
 	
 	void moveJoint(double centerX, double centerY, double Z, double roll);
-	bool checkFree();
-	void FreeMCU();
 	void timer_CAM_handle();
 	void timer_OBJECT_handle();
 
@@ -127,6 +128,29 @@ private:
 	QTimer *timer_PAIN;
 	QTimer *timer_IDLE;
 	bool idle_robot = false;
+
+	/*--TRACKING--*/
+
+	int k = 0;
+
+	double curent_X;
+	double curent_Y;
+	qint64 curent_T;
+
+	double last_X;
+	double last_Y;
+	qint64 last_T;
+
+	double V_x;
+	double V_y;
+
+	double Point0_X;
+	double Point0_Y;
+	double Point1_X;
+	double Point1_Y;
+
+
+	QElapsedTimer timer_TRACKING;
 
 };
 
