@@ -26,9 +26,10 @@ public:
 		"VIETNAM"
 	};
 	bool		addPosition(int class_id, double x, double y, double angle);
-	bool		getPosition(position &get_point);
+	bool		getPosition(position &get_point, int num);
 	bool		deletePosition(int num_id);
 	bool		isNotEmpty();
+	int			size();
 	void		clear();
 private:
 	QList <position> list_position;

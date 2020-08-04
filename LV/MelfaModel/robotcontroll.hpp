@@ -11,11 +11,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <sstream>
-//#include "debug.hpp"
+#include "debug.hpp"
 
 #define  START_CHAR         (0x28)
 #define  END_CHAR            (0x29)
-
 
 using namespace std;
 
@@ -40,7 +39,17 @@ class RobotControll : public QSerialPort
         CMD_READ_STATUS,
         CMD_READ_POSITION,
         CMD_SETTING,
-        NUM_OF_CMD, // = 11 CMD
+        CMD_METHOD_CHANGE,// 12 normal
+        CMD_JOB_NEW,
+        CMD_JOB_DELETE,
+        CMD_JOB_PUSH_MOVE_LINE,
+        CMD_JOB_PUSH_MOVE_JOINT,
+        CMD_JOB_PUSH_OUTPUT,
+        CMD_JOB_TEST,
+        CMD_JOB_RUN,// 7 job
+        CMD_KEYBOARD, // 2 key
+        CMD_KEY_SPEED,
+        NUM_OF_CMD // = 19 CMD
     };
 
     const char *ROBOTCOMMAND[NUM_OF_CMD] = {
@@ -54,7 +63,19 @@ class RobotControll : public QSerialPort
         "OUTP",
         "READ",
         "POSI",
-        "SETT"
+        "SETT",
+        "METH",// 12 normal
+
+        "JNEW",
+        "JDEL",
+        "JPML",
+        "JPMJ",
+        "JPOP",
+        "JTES",
+        "JRUN ", // 7 job
+
+        "KEYB",// 2 key
+        "KSPE"
     };
 
     enum robotRespond_t {
@@ -80,6 +101,32 @@ class RobotControll : public QSerialPort
         "STOP",
         "ERRO",
         "OKAY"
+    };
+
+    enum robotKeyBoard_t{
+        KEY_X_INC = 0,
+        KEY_X_DEC,
+        KEY_Y_INC,
+        KEY_Y_DEC,
+        KEY_Z_INC,
+        KEY_Z_DEC,
+        KEY_ROLL_INC,
+        KEY_ROLL_DEC,
+        KEY_VAR0_INC,
+        KEY_VAR0_DEC,
+        KEY_VAR1_INC,
+        KEY_VAR1_DEC,
+        KEY_VAR2_INC,
+        KEY_VAR2_DEC,
+        KEY_VAR3_INC,
+        KEY_VAR3_DEC,
+        NUM_OF_KEY// 16 key board
+    };
+
+    enum robotMethod_t {
+          METHOD_MANUAL = 0,
+          METHOD_SEMI_AUTO,
+          METHOD_AUTO
     };
 
     enum robotCoordinate_t {
@@ -111,27 +158,24 @@ class RobotControll : public QSerialPort
         Param_TimeRun
     };
 
-	/*
-	*Start NHI's Code define variable here
-	*/
-	bool StartDone = false;
-	/*
-	*Stop NHI's Code define variable here
-	*/
-
-signals:
+    const int keyboard_time_period = 500;
+  signals:
             void    commandTimeOut();
-            void    commandWorkStart(QByteArray repsond);
-            void    commandWorkRunning(QByteArray repsond);
-            void    commandWorkStop(QByteArray repsond);//khi co error
-            void    commandWorkDone(QByteArray repsond);
+            void    commandWorkStart(double x,double y, double z, double roll,
+                                                                    double var0, double var1, double var2, double var3,
+                                                                    double lenght, double time_run, double time_total);
+            void    commandWorkRunning(double x,double y, double z, double roll,
+                                                                    double var0, double var1, double var2, double var3,
+                                                                    double lenght, double time_run, double time_total);
+            void    commandWorkStop(QByteArray repsond);
+            void    commandWorkDone(double x,double y, double z, double roll,
+                                                                    double var0, double var1, double var2, double var3,
+                                                                    double lenght, double time_run, double time_total);
             void    commandSend(QByteArray command);
             void    commandAccept(QByteArray repsond);
             void    commandDeny(QByteArray repsond);
             void    respondPosition(QByteArray repsond);
             void    respondArrived(QByteArray repsond);
-			
-			
 
 private:
             bool    packData(QByteArray &data);
@@ -141,19 +185,18 @@ private:
             bool   processRespond(QByteArray &respond);
             bool   list2position(QByteArrayList list);
             bool   setCommand(robotCommand_t cmd, int time, const QString para = "");
-//            bool    setCommandNWait(robotCommand_t cmd, const QString para = "");
 
  public:
-            void    robotResetId(); //
-            bool    setModeInite(robotModeInit_t type); // B1 mode QVA
-            bool    setAccelerate(double factor); //b2 van toc
-            bool    setVelocity(double factor); // b3 gia toc
+            void    robotResetId();
+            bool    setModeInite(robotModeInit_t type);
+            bool    setAccelerate(double factor);
+            bool    setVelocity(double factor);
             bool    setTimeTotalLimit(double time);
-
+            // 11 normal
             bool    robotStop();
-            bool    robotScanLimit(); // Buoc 4: scan vi tri tuyet doi cua no => done => b5
-            bool    robotMoveHome(); // Buoc 5: 
-            bool    robotMoveLine(double x, double y, double z, double roll); // buoc v.v..
+            bool    robotScanLimit();
+            bool    robotMoveHome();
+            bool    robotMoveLine(double x, double y, double z, double roll);
 
             bool    robotMoveCircle(double x, double y, double z, double roll,
                                                             double center_x, double center_y, double center_z,
@@ -162,12 +205,26 @@ private:
             bool    robotMoveJoint(double x, double y, double z, double roll);
             bool    robotRotateSingleJoint  (int joint, double angle);
             bool    robotOutput(bool output);
-            bool    robotReadStatus();//buoc 5
+            bool    robotOutputToggle();
+            bool    robotReadStatus();
             bool    robotReadPosition();
             bool    robotSetting(robotCoordinate_t coordinate, robotTrajectory_t   trajectory);
+            bool    robotMethodChange(robotMethod_t method);
 
-			bool	isIdle();
-            bool    isScan(); //b5 done => co iscan true => moveline ,movej
+            // 7 job
+            bool    robotJobNew();
+            bool    robotJobDelete();
+            bool    robotJobPushMoveLine(double x, double y, double z, double roll);
+            bool    robotJobPushMoveJoint(double x, double y, double z, double roll);
+            bool    robotJobPushOutput(bool output);
+            bool    robotJobTest();
+            bool    robotJobRun();
+            // 3 key board
+            bool    robotKeyBoard(robotKeyBoard_t key);
+            bool    robotKeySpeedInc();
+            bool    robotKeySpeedDec();
+
+            bool       isScan();
             double  getX();
             double  getY();
             double  getZ();
@@ -185,11 +242,10 @@ private:
             QByteArray data_read;
             robotModeInit_t     mode_init = MODE_INIT_QVA;
 
-            int        id_command  = 1;
-            bool       istimeout         = false;
-
-			bool		idle = false;
-            bool       scan                = false;
+            int              id_command  = 1;
+            bool          istimeout         = false;
+            bool          output_robot = false;
+            bool          scan                    = false;
             double     x, y, z, roll;
             double     var0, var1, var2, var3;
             double     lenght;
@@ -197,10 +253,8 @@ private:
             double     time_total = 0;
             double     factor_accelerate = 0.3;
             double     factor_velocity      = 0.3;
-            double     time_total_limit     = 10;
+            double     time_total_limit              = 10;
+            int              key_speed = 1;
 };
-
-
-
 
 #endif // ROBOTCONTROLL_H

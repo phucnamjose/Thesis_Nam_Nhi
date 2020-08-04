@@ -15,7 +15,7 @@ const char* comboBox_Name[COMBOBOX_NUM] = { "comboBox_Comport","comboBox_Baudrat
 
 /*--Robot--*/
 double Zhigh = 120.0;
-double Zlow = 44.0;
+double Zlow = 42.0;
 double Xplace = 240;
 double Yplace = -170;
 double roll_place = -90;
@@ -33,14 +33,14 @@ extern Mat blob;
 extern Net net;
 extern vector<string> classes;
 // Network Params
-float confThreshold = 0.9; // Confidence threshold
+float confThreshold = 0.95; // Confidence threshold
 float nmsThreshold = 0.5;  // Non-maximum suppression threshold
 int inpWidth = 416;        // Width of network's input image
 int inpHeight = 416;       // Height of network's input image
 // Calibration Params
-const double W11 = 153.554757, W12 = -212.873131;
-const double W21 = 0.0110744904, W22 = 0.718174295;
-const double W31 = 0.706857752, W32 = 0.00278501969;
+const double W11 = 156.144746, W12 = -213.655026;
+const double W21 = 0.0066893239, W22 = 0.707419968;
+const double W31 = 0.70189917, W32 = 0.0145513433;
 // ROI
 int count_mouse = 0;
 bool flag_ROI = false;
@@ -51,13 +51,14 @@ int last_x, last_y, last_roll;
 
 // Get the names of the output layers
 GuiWindow::GuiWindow(QWidget *parent) :
-    ui(new Ui::GuiWindow)
-	//openGLWindow(new OpenGLWindow)
+	ui(new Ui::GuiWindow)
+	
 {
     ui->setupUi(this);
 
 	// Serial for uart
 	controller = new RobotControll(this);
+	
 	gui_init();
 	robotInit();
 	// Timer for update position
@@ -67,8 +68,6 @@ GuiWindow::GuiWindow(QWidget *parent) :
 	object = new Object();
 	timer_OBJECT = new QTimer(this);
 	connect(timer_OBJECT, &QTimer::timeout, this, &GuiWindow::timer_OBJECT_handle);
-	timer_IDLE = new QTimer(this);
-	connect(timer_OBJECT, &QTimer::timeout, this, &GuiWindow::timer_IDLE_handle);
 	// Pain
 	timer_PAIN = new QTimer(this);
 	connect(timer_PAIN, &QTimer::timeout, this, &GuiWindow::timer_PAIN_handle);
@@ -168,7 +167,8 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 
 				double x_absolute = W11 + W21*x_cam + W31*y_cam;
 				double y_absolute = W12 + W22*x_cam + W32*y_cam;
-				printf(" toa do x= %d, y = %d \r\n", x_absolute, y_absolute);
+				
+				ui->textEdit_Position->append(tr("X: %1 \nY: %2 \n").arg(x_cam).arg(y_cam));
 
 				X.push_back(x_absolute);
 				Y.push_back(y_absolute);
@@ -193,7 +193,6 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 			box.x + box.width, box.y + box.height, frame, angle))
 		{
 			ID_TRUE.push_back(classIds.at(idx));
-			//ui->textEdit_Position->append(tr("ID CLASS: %1 \n").arg(classIds.at(idx)));
 			X_TRUE.push_back(X.at(idx));
 			Y_TRUE.push_back(Y.at(idx));
 			ANGLE_TRUE.push_back(angle);
@@ -260,11 +259,31 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		&& r.x + r.width <= frame.cols
 		&&  r.y + r.height <= frame.rows)
 	{
-		//ui->textEdit_Position->append(tr("qua kiem r"));
 		imageCrop = frame(r);
+		//flip(imageCrop, imageCrop, 1);
+		//imshow("magic", imageCrop); 
 		//**Convert image from BGR -> HSV**
+		
 		Mat gray;
 		cvtColor(imageCrop, gray, COLOR_BGR2GRAY);
+		
+		//Mat mask1, mask2;
+		/*inRange(hsv, Scalar(0, 120, 70), Scalar(10, 255, 255), mask1);
+		inRange(hsv, Scalar(170, 120, 70), Scalar(180, 255, 255), mask2);
+		/*mask1 = mask1 + mask2;
+		Mat kernel = Mat::ones(3, 3, CV_32F);
+		morphologyEx(mask1, mask1, cv::MORPH_OPEN, kernel);
+		morphologyEx(mask1, mask1, cv::MORPH_DILATE, kernel);
+		bitwise_not(mask1, mask2);
+		Mat res1, res2, final_output, background;
+		bitwise_and(imageCrop, imageCrop, res1, mask2);
+		bitwise_and(background, background, res2, mask1);
+		addWeighted(res1, 1, res2, 1, 0, final_output);
+		imshow("magic", final_output);*/
+	
+
+
+
 
 		//**Threshold**
 		Mat frame_threshold;
@@ -285,12 +304,11 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		//**Detect edges using canny**
 		Mat canny;
 		Canny(frame_filter, canny, 300, 600, 3);
-		imshow("Canny", canny);
+		//imshow("Canny", canny);
 		
 		//**HoughLines**
 		vector<Vec4i> lines;
 		HoughLinesP(canny, lines, 1, CV_PI / 180, 30, 50, 10);
-		ui->textEdit_Position->append(tr("line : %1 \n  ").arg(lines.size()));
 
 		//**Draw a rectangle displaying the bounding box**
 		rectangle(frame, Point(left, top), Point(right, bottom), Scalar(255, 178, 50), 3);
@@ -362,7 +380,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		}
 		angle /= lines.size();
 		angle = W1 + (angle * 180 / CV_PI)*W2;
-		ui->textEdit_Position->setText(tr("angle: %1 \n").arg(angle));
+
+		ui->textEdit_Position->append(tr("Angle: %1 \n").arg(angle));
 		imshow("Object", drawing);
 		return true;	
 	}
@@ -493,10 +512,17 @@ void GuiWindow::timer_OBJECT_handle()
 {
 	if (object->isNotEmpty() && (state_robot == STATE_READY))
 	{
-		object->getPosition(target);
-		connect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
-		connect(controller, &RobotControll::commandDeny, this, &GuiWindow::overWorkSpace);
-		pickAndPlace();
+		for (int i = 0; i < object->size(); i++)
+		{
+			object->getPosition(target, i);
+			if (((target.class_id == 0) && !japan_full) || ((target.class_id == 1) && !vietnam_full))
+			{
+				connect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
+				connect(controller, &RobotControll::commandDeny, this, &GuiWindow::overWorkSpace);
+				pickAndPlace();
+				break;
+			}
+		}
 	}
 }
 /*--ROBOT--*/
@@ -704,8 +730,8 @@ void GuiWindow::pickAndPlace()
 					target_success_jp++;
 					if (target_success_jp == 5)
 					{
-						ui->textEdit_Waring->append("WARNING: Exceeding the height of Japan bundle");
-						target_success_jp = 0;
+						ui->textEdit_Waring->append("WARNING: FULL JAPAN COLLUMN");
+						japan_full = true;
 					}	
 				}
 				else
@@ -713,14 +739,14 @@ void GuiWindow::pickAndPlace()
 					target_success_vn++;
 					if (target_success_vn == 5)
 					{
-						ui->textEdit_Waring->append("WARNING: Exceeding the height of Viet Nam bundle");
-						target_success_vn = 0;
+						ui->textEdit_Waring->append("WARNING: FULL VIETNAM COLLUMN");
+						vietnam_full = true;
 					}
 				}
 				state_robot = STATE_READY;  
-				object->deletePosition(0);
+				object->clear();
 				disconnect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
-
+				disconnect(controller, &RobotControll::commandDeny, this, &GuiWindow::overWorkSpace);
 			}
 		break;
 		default: {}
@@ -807,24 +833,26 @@ void GuiWindow::on_pushButton_Scan_clicked()
 	controller->robotScanLimit();
 }
 
-void GuiWindow::on_pushButton_TestMoveJoint_clicked() 
+void GuiWindow::on_pushButton_Paint_clicked() 
 {
-	timer_PAIN->start(400);
+	timer_PAIN->start(50);
 }
 
 void GuiWindow::on_pushButton_Home_clicked()
 { 
 	ui->textEdit_Waring->setText("WARNING: Robot is at home status");
-	state_robot = STATE_READY;
-	target_success_jp = 0;
-	target_success_vn = 0;
-	collum_jp = 0;
-	collum_vn = 0;
 	timer_OBJECT->stop();
-	timer_IDLE->stop();
+	disconnect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
+	disconnect(controller, &RobotControll::commandDeny, this, &GuiWindow::overWorkSpace);
+	state_robot = STATE_READY;
+	//target_success_jp = 0;
+	//target_success_vn = 0;
+	//japan_full = false;
+	//vietnam_full = false;
 	object->clear();
 	controller->robotOutput(false);
 	controller->robotMoveHome();
+
 }
 
 void  GuiWindow::on_pushButton_Stop_clicked()
@@ -865,7 +893,18 @@ void GuiWindow::on_pushButton_Start_clicked()
 {
 	ui->textEdit_Waring->setText("WARNING: Robot is starting");
 	timer_OBJECT->start(200);
-	timer_IDLE->start(100);	
+}
+
+void GuiWindow::on_pushButton_Japan_Full_clicked()
+{
+	japan_full = false;
+	target_success_jp = 0;
+}
+
+void GuiWindow::on_pushButton_Vietnam_Full_clicked()
+{
+	vietnam_full = false;
+	target_success_vn = 0;
 }
 
 void GuiWindow::displayPosition(double x, double y, double roll) 
@@ -875,19 +914,15 @@ void GuiWindow::displayPosition(double x, double y, double roll)
 
 void GuiWindow::timer_PAIN_handle()
 {
+	if (controller->isScan())
 	{
 		double deg0, deg1, deg2, deg3;
 		deg0 = controller->getVar0();
 		deg1 = controller->getVar1();
 		deg2 = controller->getVar2();
 		deg3 = controller->getVar3();
-		openGLWindow->setAngle(deg0, deg1, deg2, deg3);
+		ui->openGL->setAngle(deg0, deg1, deg2, deg3);
 		ui->textEdit_Inform->clear();
 		ui->textEdit_Inform->append(tr("%1 %2 %3 %4").arg(deg0).arg(deg1).arg(deg2).arg(deg3));
 	}
-}
-
-void GuiWindow::timer_IDLE_handle()
-{
-	idle_robot = controller->isIdle();
 }

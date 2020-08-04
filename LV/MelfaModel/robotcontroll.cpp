@@ -1,8 +1,5 @@
 #include "robotcontroll.hpp"
 
-
-
-
 // Constructor
 RobotControll::RobotControll(QObject *parent):QSerialPort(parent)
 {
@@ -18,9 +15,8 @@ RobotControll::~RobotControll()
 // Pack Command
 bool RobotControll::packData(QByteArray &data)
 {
-
     if(data.isNull() || data.isEmpty()) {
-        //M_DEBUG("data input is empty");
+        M_DEBUG("data input is empty");
         return false;
     }
     // packing
@@ -31,7 +27,7 @@ bool RobotControll::packData(QByteArray &data)
     data.clear();
     data.append(temp);
 
-    //Debug::_delete(temp);
+    Debug::_delete(temp);
     return true;
 }
 
@@ -39,11 +35,11 @@ bool RobotControll::packData(QByteArray &data)
 bool RobotControll::unPackData(QByteArray &data)
 {
     if(data.isNull() || data.isEmpty()) {
-        //M_DEBUG("data input is null");
+        M_DEBUG("data input is null");
         return false;
     }
     if(data.at(0) != START_CHAR || data.at(data.length()-1) != END_CHAR) {
-        //M_DEBUG("begin or end charater wrong");
+        M_DEBUG("begin or end charater wrong");
         return false;
     }
     QByteArray temp;
@@ -54,7 +50,7 @@ bool RobotControll::unPackData(QByteArray &data)
     data.clear();
     data.append(temp);
 
-    //Debug::_delete(temp);
+    Debug::_delete(temp);
     return true;
 }
 
@@ -68,13 +64,13 @@ bool RobotControll::writeData(QByteArray &data) {
     if(this->isOpen()) {
         // Pack Payload
         if( this->packData(data) == false ) {
-            //M_DEBUG("pack fail");
+            M_DEBUG("pack fail");
             return false;
         }
         this->write(data);
-        //M_DEBUG(qbyteArray2string(data));
+        M_DEBUG(qbyteArray2string(data));
     } else {
-        //M_DEBUG("no device");
+        M_DEBUG("no device");
         return false;
     }
     return true;
@@ -90,17 +86,17 @@ void RobotControll::readData() {
             data_read.remove(0, data_read.indexOf(END_CHAR) +1);
             // Unpack Payload
             if ( this->unPackData(temp) == false ) {
-                //M_DEBUG("unpack fail");
-                //M_DEBUG(qbyteArray2string(temp));
+                M_DEBUG("unpack fail");
+                M_DEBUG(qbyteArray2string(temp));
                 continue;
             }
             if (!processRespond(temp)) {
-                //M_DEBUG("error frame");
+                M_DEBUG("error frame");
                 continue;
             }
         }
     } else {
-        //M_DEBUG("no device");
+        M_DEBUG("no device");
         return;
     }
 }
@@ -116,7 +112,6 @@ bool   RobotControll::processRespond(QByteArray &repsond) {
         respond_code += list.at(1);
         // IDLE
         if (respond_code == ROBOTRESPOND[RPD_IDLE]) {
-			idle = true;
             if (list.at(2).toInt() == 1) {  scan = true;}
             else if (list.at(2).toInt() == 0) {  scan = false;}
             // Send Signal
@@ -124,7 +119,6 @@ bool   RobotControll::processRespond(QByteArray &repsond) {
 
         // BUSY
         } else if (respond_code == ROBOTRESPOND[RPD_BUSY]) {
-			idle = false;
             if (list.at(2).toInt() == 1) {  scan = true;}
             else if (list.at(2).toInt() == 0) {  scan = false;}
             // Send Signal
@@ -139,19 +133,19 @@ bool   RobotControll::processRespond(QByteArray &repsond) {
         } else if (respond_code == ROBOTRESPOND[RPD_START]) {
             list2position(list);
             // Send Signal
-            emit commandWorkStart(repsond);
+            emit commandWorkStart(x, y, z, roll, var0, var1, var2, var3, lenght, time_run, time_total);
 
         // RUNN
         } else if (respond_code == ROBOTRESPOND[RPD_RUNNING]) {
             list2position(list);
             // Send Signal
-            emit commandWorkRunning(repsond);
+            emit commandWorkRunning(x, y, z, roll, var0, var1, var2, var3, lenght, time_run, time_total);
 
         // DONE
         } else if (respond_code == ROBOTRESPOND[RPD_DONE]) {
             list2position(list);
             // Send Signal
-            emit commandWorkDone(repsond);
+            emit commandWorkDone(x, y, z, roll, var0, var1, var2, var3, lenght, time_run, time_total);
 
         // STOP
         } else if (respond_code == ROBOTRESPOND[RPD_STOP]) {
@@ -217,13 +211,13 @@ bool RobotControll::setCommand(robotCommand_t cmd, int time, const QString para)
     }
     command_pack.append(command);
     if(this->writeData(command_pack) == false) {
-        //M_DEBUG("write data fail");
-        //Debug::_delete(command);
+        M_DEBUG("write data fail");
+        Debug::_delete(command);
         return false;
     }
     emit commandSend(command);    // Set Signal
     id_command++;
-    //Debug::_delete(command);
+    Debug::_delete(command);
     return true;
 }
 
@@ -375,12 +369,19 @@ bool RobotControll::robotRotateSingleJoint(int joint, double angle) {
 
 bool RobotControll::robotOutput(bool output){
     int value = 0;
-    if(output){ value = 1;}
+    if(output){
+        value = 1;
+    }
     if(this->setCommand(this->CMD_OUTPUT, 1000, tr("%1")
                               .arg(value)) == false ){
         return false;
     }
+    output_robot = output;
     return true;
+}
+
+bool  RobotControll::robotOutputToggle() {
+    return robotOutput(!output_robot);
 }
 
 bool RobotControll::robotReadStatus(){
@@ -397,7 +398,7 @@ bool RobotControll::robotReadPosition(){
     return true;
 }
 
-bool  RobotControll::robotSetting(robotCoordinate_t coordinate, robotTrajectory_t   trajectory) {
+bool RobotControll::robotSetting(robotCoordinate_t coordinate, robotTrajectory_t   trajectory) {
     if(this->setCommand(this->CMD_SETTING, 1000, tr("%1 %2")
                                               .arg(int(coordinate))
                                                .arg(int(trajectory))) == false ){
@@ -406,7 +407,121 @@ bool  RobotControll::robotSetting(robotCoordinate_t coordinate, robotTrajectory_
     return true;
 }
 
-bool   RobotControll::isScan() {
+bool  RobotControll::robotMethodChange(robotMethod_t method) {
+    if(this->setCommand(this->CMD_METHOD_CHANGE, 1000, tr("%1")
+                                               .arg(int(method))) == false ){
+        return false;
+    }
+    return true;
+}
+
+bool RobotControll:: robotJobNew() {
+    if(this->setCommand(this->CMD_JOB_NEW, 1000, tr("")) == false ) {
+        return false;
+    }
+    return true;
+}
+
+bool RobotControll::robotJobDelete() {
+    if(this->setCommand(this->CMD_JOB_DELETE, 1000, tr("")) == false ) {
+        return false;
+    }
+    return true;
+}
+
+bool RobotControll::robotJobPushMoveLine(double x, double y, double z, double roll) {
+    double temp;
+    if (mode_init == MODE_INIT_QVA) {
+        temp = factor_accelerate;
+    } else {
+        temp = time_total_limit;
+    }
+    if(this->setCommand(this->CMD_JOB_PUSH_MOVE_LINE, 1000, tr("%1 %2 %3 %4 %5 %6 %7")
+                              .arg(x)
+                              .arg(y)
+                              .arg(z)
+                              .arg(roll)
+                              .arg(factor_velocity)
+                              .arg(int(mode_init))
+                              .arg(temp)) == false ){
+        return false;
+    }
+    return true;
+}
+
+bool RobotControll:: robotJobPushMoveJoint(double x, double y, double z, double roll) {
+    double temp;
+    if (mode_init == MODE_INIT_QVA) {
+        temp = factor_accelerate;
+    } else {
+        temp = time_total_limit;
+    }
+    if(this->setCommand(this->CMD_JOB_PUSH_MOVE_JOINT, 1000, tr("%1 %2 %3 %4 %5 %6 %7")
+                                              .arg(x)
+                                              .arg(y)
+                                              .arg(z)
+                                              .arg(roll)
+                                              .arg(factor_velocity)
+                                              .arg(int(mode_init))
+                                              .arg(temp)) == false ){
+        return false;
+    }
+    return true;
+}
+
+bool RobotControll::robotJobPushOutput(bool output) {
+    int value = 0;
+    if(output){ value = 1;}
+    if(this->setCommand(this->CMD_JOB_PUSH_OUTPUT, 1000, tr("%1")
+                              .arg(value)) == false ){
+        return false;
+    }
+    return true;
+}
+
+bool RobotControll:: robotJobTest() {
+    if(this->setCommand(this->CMD_JOB_TEST, 1000, tr("")) == false ) {
+        return false;
+    }
+    return true;
+}
+
+bool RobotControll:: robotJobRun() {
+    if(this->setCommand(this->CMD_JOB_RUN, 1000, tr("")) == false ) {
+        return false;
+    }
+    return true;
+}
+
+bool  RobotControll::robotKeyBoard(robotKeyBoard_t key) {
+    if(this->setCommand(this->CMD_KEYBOARD, 1000, tr("%1").arg(int(key))) == false ) {
+        return false;
+    }
+   return true;
+}
+
+// speed : 1 --> 10
+bool  RobotControll::robotKeySpeedInc() {
+    if ( key_speed > 1) {
+        key_speed--;
+    }
+    if(this->setCommand(this->CMD_KEY_SPEED, 1000, tr("%1").arg(int(key_speed))) == false ) {
+        return false;
+    }
+    return true;
+}
+
+bool  RobotControll::robotKeySpeedDec() {
+    if ( key_speed < 5) {
+        key_speed++;
+    }
+    if(this->setCommand(this->CMD_KEY_SPEED, 1000, tr("%1").arg(int(key_speed))) == false ) {
+        return false;
+    }
+    return true;
+}
+
+bool  RobotControll::isScan() {
     return scan;
 }
 
@@ -493,11 +608,4 @@ double RobotControll::getTotalTime() {
 
 double RobotControll:: getTimeRun() {
     return time_run;
-}
-
-
-bool RobotControll::isIdle()
-{
-	robotReadStatus();
-	return idle;
 }

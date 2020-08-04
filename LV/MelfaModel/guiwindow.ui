@@ -6,19 +6,43 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1218</width>
-    <height>597</height>
+    <width>1197</width>
+    <height>648</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>VISION MODE</string>
+       </attribute>
+       <widget class="OpenGLWindow" name="openGL" native="true">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>0</y>
+          <width>701</width>
+          <height>651</height>
+         </rect>
+        </property>
+       </widget>
        <widget class="QGroupBox" name="groupBox">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>441</width>
+          <height>161</height>
+         </rect>
+        </property>
         <property name="title">
          <string>Robot</string>
         </property>
@@ -27,43 +51,45 @@
           <rect>
            <x>10</x>
            <y>20</y>
-           <width>181</width>
-           <height>126</height>
+           <width>421</width>
+           <height>128</height>
           </rect>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
-             <widget class="QLabel" name="label_Comport">
-              <property name="text">
-               <string>COM PORT</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QLabel" name="label_Comport">
+                <property name="text">
+                 <string>COM PORT</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBox_Comport"/>
+              </item>
+             </layout>
             </item>
             <item>
-             <widget class="QComboBox" name="comboBox_Comport"/>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QLabel" name="label_Baudrate">
+                <property name="text">
+                 <string>BAUD RATE</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBox_Baudrate"/>
+              </item>
+             </layout>
             </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QLabel" name="label_Baudrate">
-              <property name="text">
-               <string>BAUD RATE</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QComboBox" name="comboBox_Baudrate"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_Connect">
-            <property name="styleSheet">
-             <string notr="true">#pushButton_Connect
+             <widget class="QPushButton" name="pushButton_Connect">
+              <property name="styleSheet">
+               <string notr="true">#pushButton_Connect
 {
 color: white;
 border-width: 2px;
@@ -72,235 +98,106 @@ border-color:black;
 border-radius:10px;
 background-color:gray;
 }</string>
-            </property>
-            <property name="text">
-             <string>Connect</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QLabel" name="label_Velocity">
-                <property name="text">
-                 <string>VELOCITY</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QSlider" name="sliderVelocity">
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="maximum">
-                 <number>100</number>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </widget>
-              </item>
-             </layout>
+              </property>
+              <property name="text">
+               <string>Connect</string>
+              </property>
+             </widget>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_4">
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
-               <widget class="QLabel" name="label_Accelerate">
-                <property name="text">
-                 <string>ACCERLERATE</string>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label_Velocity">
+                  <property name="text">
+                   <string>VELOCITY</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSlider" name="sliderVelocity">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>100</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item>
-               <widget class="QSlider" name="sliderAccerlerate">
-                <property name="minimum">
-                 <number>1</number>
-                </property>
-                <property name="maximum">
-                 <number>100</number>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <widget class="QLabel" name="label_Accelerate">
+                  <property name="text">
+                   <string>ACCERLERATE</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSlider" name="sliderAccerlerate">
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>100</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </item>
            </layout>
           </item>
-         </layout>
-        </widget>
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>150</y>
-           <width>411</width>
-           <height>411</height>
-          </rect>
-         </property>
-         <property name="title">
-          <string>Camera</string>
-         </property>
-         <widget class="QLabel" name="label_Camera">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>20</y>
-            <width>260</width>
-            <height>200</height>
-           </rect>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>260</width>
-            <height>200</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>260</width>
-            <height>200</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Box</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <property name="lineWidth">
-           <number>5</number>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="pushButton_StartCamera">
-          <property name="geometry">
-           <rect>
-            <x>260</x>
-            <y>200</y>
-            <width>31</width>
-            <height>31</height>
-           </rect>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">#pushButton_StartCamera
-{
-border:none;
-}</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-         <widget class="QTextEdit" name="textEdit_Position">
-          <property name="geometry">
-           <rect>
-            <x>270</x>
-            <y>250</y>
-            <width>131</width>
-            <height>151</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QTextEdit" name="textEdit_Inform">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>250</y>
-            <width>261</width>
-            <height>91</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QTextEdit" name="textEdit_Waring">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>360</y>
-            <width>261</width>
-            <height>61</height>
-           </rect>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_Error">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>230</y>
-            <width>47</width>
-            <height>13</height>
-           </rect>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">#label_Error
-{
-color: red;
-border-width: 1px;
-border-style: solid;
-border-color:darkblue;
-}</string>
-          </property>
-          <property name="text">
-           <string>ERROR:</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_Warning">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>340</y>
-            <width>61</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">#label_Warning
-{
-color:yellow;
-border-width: 1px;
-border-style: solid;
-border-color:darkblue;
-}</string>
-          </property>
-          <property name="text">
-           <string>WARNING:</string>
-          </property>
-         </widget>
-        </widget>
-        <widget class="QWidget" name="layoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>200</x>
-           <y>20</y>
-           <width>101</width>
-           <height>121</height>
-          </rect>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QPushButton" name="pushButton_Home">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-            <property name="maximumSize">
+            <property name="sizeType">
+             <enum>QSizePolicy::Minimum</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
              <size>
-              <width>10000</width>
-              <height>16777215</height>
+              <width>50</width>
+              <height>20</height>
              </size>
             </property>
-            <property name="layoutDirection">
-             <enum>Qt::LeftToRight</enum>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">#pushButton_Home
+           </spacer>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <widget class="QPushButton" name="pushButton_Scan">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#pushButton_Scan
 {
 color: white;
 border-width: 2px;
@@ -309,16 +206,34 @@ border-color:black;
 border-radius:10px;
 background-color:gray;
 }</string>
-            </property>
-            <property name="text">
-             <string>HOME</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_Start">
-            <property name="styleSheet">
-             <string notr="true">#pushButton_Start
+              </property>
+              <property name="text">
+               <string>SCAN</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_Stop">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#pushButton_Stop
 {
 color: white;
 border-width: 2px;
@@ -327,16 +242,149 @@ border-color:black;
 border-radius:10px;
 background-color:gray;
 }</string>
-            </property>
-            <property name="text">
-             <string>START</string>
-            </property>
-           </widget>
+              </property>
+              <property name="text">
+               <string>STOP</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_Paint">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#pushButton_Paint
+{
+color: white;
+border-width: 2px;
+border-style: solid;
+border-color:black;
+border-radius:10px;
+background-color:gray;
+}</string>
+              </property>
+              <property name="text">
+               <string>Paint</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_SetROI">
-            <property name="styleSheet">
-             <string notr="true">#pushButton_SetROI
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <widget class="QPushButton" name="pushButton_Home">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#pushButton_Home
+{
+color: white;
+border-width: 2px;
+border-style: solid;
+border-color:black;
+border-radius:10px;
+background-color:gray;
+}</string>
+              </property>
+              <property name="text">
+               <string>HOME</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_Start">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#pushButton_Start
+{
+color: white;
+border-width: 2px;
+border-style: solid;
+border-color:black;
+border-radius:10px;
+background-color:gray;
+}</string>
+              </property>
+              <property name="text">
+               <string>START</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_SetROI">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">#pushButton_SetROI
 {
 color: white;
 border-width: 2px;
@@ -350,96 +398,266 @@ background-color:gray;
  	border-color:black;
    background-color:green;
 }</string>
-            </property>
-            <property name="text">
-             <string>ROI</string>
-            </property>
-           </widget>
+              </property>
+              <property name="text">
+               <string>ROI</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>160</y>
+          <width>441</width>
+          <height>471</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Camera</string>
+        </property>
         <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
-           <x>310</x>
+           <x>10</x>
            <y>20</y>
-           <width>101</width>
-           <height>121</height>
+           <width>421</width>
+           <height>381</height>
           </rect>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
+         <layout class="QVBoxLayout" name="verticalLayout_8">
           <item>
-           <widget class="QPushButton" name="pushButton_Scan">
-            <property name="styleSheet">
-             <string notr="true">#pushButton_Scan
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QLabel" name="label_Camera">
+              <property name="minimumSize">
+               <size>
+                <width>260</width>
+                <height>200</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>260</width>
+                <height>200</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <property name="lineWidth">
+               <number>5</number>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+               <widget class="QPushButton" name="pushButton_Japan_Full">
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>JP FULL</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_Vietnam_Full">
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>VN FULL</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Minimum</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>10</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_StartCamera">
+                <property name="maximumSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">#pushButton_StartCamera
 {
-color: white;
-border-width: 2px;
-border-style: solid;
-border-color:black;
-border-radius:10px;
-background-color:gray;
+border:none;
 }</string>
-            </property>
-            <property name="text">
-             <string>SCAN</string>
-            </property>
-           </widget>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_Stop">
-            <property name="styleSheet">
-             <string notr="true">#pushButton_Stop
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QLabel" name="label_Error">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>260</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">#label_Error
 {
-color: white;
-border-width: 2px;
+color: red;
+border-width: 1px;
 border-style: solid;
-border-color:black;
-border-radius:10px;
-background-color:gray;
+border-color:darkblue;
 }</string>
-            </property>
-            <property name="text">
-             <string>STOP</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_Paint">
-            <property name="styleSheet">
-             <string notr="true">#pushButton_Paint
+                </property>
+                <property name="text">
+                 <string>ERROR:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QTextEdit" name="textEdit_Inform">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>260</width>
+                  <height>50</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>260</width>
+                  <height>50</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_Warning">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>260</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">#label_Warning
 {
-color: white;
-border-width: 2px;
+color:yellow;
+border-width: 1px;
 border-style: solid;
-border-color:black;
-border-radius:10px;
-background-color:gray;
+border-color:darkblue;
 }</string>
-            </property>
-            <property name="text">
-             <string>Paint</string>
-            </property>
-           </widget>
+                </property>
+                <property name="text">
+                 <string>WARNING:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QTextEdit" name="textEdit_Waring">
+                <property name="maximumSize">
+                 <size>
+                  <width>260</width>
+                  <height>50</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTextEdit" name="textEdit_Position">
+              <property name="maximumSize">
+               <size>
+                <width>150</width>
+                <height>150</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
-        <widget class="OpenGLWindow" name="widget" native="true">
-         <property name="geometry">
-          <rect>
-           <x>430</x>
-           <y>20</y>
-           <width>721</width>
-           <height>521</height>
-          </rect>
-         </property>
-        </widget>
        </widget>
-      </item>
-     </layout>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>JOB MODE</string>
+       </attribute>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1197</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
   <customwidget>

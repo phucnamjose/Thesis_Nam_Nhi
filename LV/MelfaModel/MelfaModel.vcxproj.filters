@@ -86,6 +86,9 @@
     <ClCompile Include="box.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="debug.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="guiwindow.h">
@@ -141,6 +144,9 @@
     </ClInclude>
     <ClInclude Include="box.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

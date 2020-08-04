@@ -6,15 +6,15 @@
 #include <QTimer>
 #include <QDebug>
 
-OpenGLWindow::OpenGLWindow(QWidget *parent):
-    //QOpenGLWidget(parent)
-     m_context(0)
+OpenGLWindow::OpenGLWindow(QWidget *parent) :
+	QOpenGLWidget(parent)
+    ,m_context(0)
     , m_timer(0)
     , m_xRot(0)
     , m_yRot(0)
     , m_zRot(0)
     , m_scale(1.0f)
-    , degJ{-35.9, 72.2, 0.861, 5.4, 0}
+    , degJ{-90, 90, 0,0, 0}
 {
     m_context = createOpenGLContext(3, 3);
 
@@ -22,11 +22,11 @@ OpenGLWindow::OpenGLWindow(QWidget *parent):
     resize( 800, 600 );
     create();
 
-    int refreshTime = 10;
-    m_timer = new QTimer;
-    m_timer->setInterval(refreshTime);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
-    m_timer->start();
+    //int refreshTime = 10;
+    //m_timer = new QTimer;
+    //m_timer->setInterval(refreshTime);
+    //connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
+    //m_timer->start();
 }
 
 OpenGLWindow::~OpenGLWindow()
@@ -168,7 +168,7 @@ void OpenGLWindow::setAngle(double deg0, double deg1, double deg2, double deg3)
 {
 	degJ[0] = deg0;
 	degJ[1] = deg1;
-	degJ[2] = -deg2/100;
+	degJ[2] = deg2/1000;
 	degJ[3] = deg3;
-	//paintGL();
+	update();
 }

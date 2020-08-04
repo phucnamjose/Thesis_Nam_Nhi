@@ -85,12 +85,14 @@ private slots:
 	/*--GUI--*/
 	void on_pushButton_Connect_clicked();
 	void on_pushButton_Scan_clicked();
-	void on_pushButton_TestMoveJoint_clicked();
+	void on_pushButton_Paint_clicked();
 	void on_pushButton_Home_clicked();
 	void on_pushButton_Stop_clicked();
 	void on_pushButton_StartCamera_toggled(bool checked);
 	void on_pushButton_SetROI_clicked();
 	void on_pushButton_Start_clicked();
+	void on_pushButton_Japan_Full_clicked();
+	void on_pushButton_Vietnam_Full_clicked();
 	void slide_Velocity();
 	void slide_Accelerate();
 	
@@ -108,7 +110,6 @@ private slots:
 	void pickAndPlace();
 	void overWorkSpace();
 	void timer_PAIN_handle();
-	void timer_IDLE_handle();
 private:
 	/*--GUI--*/
     Ui::GuiWindow *ui;
@@ -122,11 +123,12 @@ private:
 	QTimer *timer_serial_comboBox = nullptr;
 	bool output_robot;
 	robotPickAndPlace_t state_robot = STATE_READY;
+	bool	japan_full = false; 
+	bool	vietnam_full = false;
 
 	/*--ROBOT--*/
 	QTimer *timer_OBJECT;
 	QTimer *timer_PAIN;
-	QTimer *timer_IDLE;
 	bool idle_robot = false;
 
 	/*--TRACKING--*/
