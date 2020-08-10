@@ -89,6 +89,9 @@
     <ClCompile Include="debug.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="serialport.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="guiwindow.h">
@@ -119,6 +122,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="robotcontroll.hpp">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="serialport.hpp">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

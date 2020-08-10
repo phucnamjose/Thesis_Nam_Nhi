@@ -217,11 +217,13 @@
     <ClCompile Include="object_detect.cpp" />
     <ClCompile Include="openglwindow.cpp" />
     <ClCompile Include="robotcontroll.cpp" />
+    <ClCompile Include="serialport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="box.h" />
     <ClInclude Include="debug.hpp" />
     <ClInclude Include="object_detect.h" />
+    <QtMoc Include="serialport.hpp" />
     <QtMoc Include="robotcontroll.hpp" />
     <QtMoc Include="guiwindow.h">
     </QtMoc>

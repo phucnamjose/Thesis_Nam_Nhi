@@ -248,42 +248,6 @@ background-color:gray;
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_Paint">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>60</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>60</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">#pushButton_Paint
-{
-color: white;
-border-width: 2px;
-border-style: solid;
-border-color:black;
-border-radius:10px;
-background-color:gray;
-}</string>
-              </property>
-              <property name="text">
-               <string>Paint</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
           <item>

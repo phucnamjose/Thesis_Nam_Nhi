@@ -2,23 +2,23 @@
 #define ROBOTCONTROLL_H
 
 #include <QObject>
-#include <QtSerialPort/QSerialPort>
-#include <QtSerialPort/QSerialPortInfo>
 #include <QDebug>
 #include <QTimer>
 #include <QEventLoop>
+#include <QSerialPortInfo>
 
 #include <stdio.h>
 #include <string.h>
 #include <sstream>
 #include "debug.hpp"
+#include "serialport.hpp"
 
 #define  START_CHAR         (0x28)
 #define  END_CHAR            (0x29)
 
 using namespace std;
 
-class RobotControll : public QSerialPort
+class RobotControll : public QObject
 {
     Q_OBJECT
 
@@ -158,8 +158,10 @@ class RobotControll : public QSerialPort
         Param_TimeRun
     };
 
-    const int keyboard_time_period = 500;
+    const int keyboard_time_period = 600;
+    const int update_period = 200;
   signals:
+            // to main thread
             void    commandTimeOut();
             void    commandWorkStart(double x,double y, double z, double roll,
                                                                     double var0, double var1, double var2, double var3,
@@ -177,16 +179,31 @@ class RobotControll : public QSerialPort
             void    respondPosition(QByteArray repsond);
             void    respondArrived(QByteArray repsond);
 
+            void    updatePosition(double x,double y, double z, double roll,
+                                   double var0, double var1, double var2, double var3,
+                                   double lenght, double time_run, double time_total);
+            //to child thread
+            void    main_sendThroughSerial(QByteArray data);
+
+private slots:
+            void    child_updatePosition();
 private:
-            bool    packData(QByteArray &data);
+            // child thread call
             bool    unPackData(QByteArray &data);
-            bool    writeData(QByteArray &data);
             void    readData();
             bool   processRespond(QByteArray &respond);
             bool   list2position(QByteArrayList list);
-            bool   setCommand(robotCommand_t cmd, int time, const QString para = "");
+            // main thread call
+            bool    writeData(QByteArray &data);
+            bool    packData(QByteArray &data);
+            bool   setCommand(robotCommand_t cmd, const QString para = "");
+            //bool   getCommand(robotCommand_t cmd, const QString para = "");
 
  public:
+            bool   isOpen();
+            bool   openComPort(QString port_name);
+            bool   closeComPort();
+
             void    robotResetId();
             bool    setModeInite(robotModeInit_t type);
             bool    setAccelerate(double factor);
@@ -224,31 +241,23 @@ private:
             bool    robotKeySpeedInc();
             bool    robotKeySpeedDec();
 
-            bool       isScan();
-            double  getX();
-            double  getY();
-            double  getZ();
-            double  getRoll();
-            double  getVar0();
-            double  getVar1();
-            double  getVar2();
-            double  getVar3();
-            double  getLenght();
-            double  getTotalTime();
-            double  getTimeRun();
-            double  getValue(robotParam_t param);
-
  private:
+            SerialPort  *port;
+            QThread     *my_thread;
+            QTimer        *timer_update;
+            // receive variable ---> child thread ---> main thread do not access
             QByteArray data_read;
-            robotModeInit_t     mode_init = MODE_INIT_QVA;
-
             int              id_command  = 1;
             bool          istimeout         = false;
-            bool          output_robot = false;
             bool          scan                    = false;
             double     x, y, z, roll;
             double     var0, var1, var2, var3;
             double     lenght;
+
+            // transmit varialble ---> main thread
+            bool           portOpen = false;
+            robotModeInit_t     mode_init = MODE_INIT_QVA;
+            bool          output_robot = false;
             double     time_run = 0;
             double     time_total = 0;
             double     factor_accelerate = 0.3;

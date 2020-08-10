@@ -85,7 +85,6 @@ private slots:
 	/*--GUI--*/
 	void on_pushButton_Connect_clicked();
 	void on_pushButton_Scan_clicked();
-	void on_pushButton_Paint_clicked();
 	void on_pushButton_Home_clicked();
 	void on_pushButton_Stop_clicked();
 	void on_pushButton_StartCamera_toggled(bool checked);
@@ -109,7 +108,9 @@ private slots:
 	void serial_handleError(QSerialPort::SerialPortError error);    // connect error handle
 	void pickAndPlace();
 	void overWorkSpace();
-	void timer_PAIN_handle();
+	void updatePosition(double x, double y, double z, double roll,
+						double var0, double var1, double var2, double var3,
+						double lenght, double time_run, double time_total);
 private:
 	/*--GUI--*/
     Ui::GuiWindow *ui;
@@ -128,31 +129,8 @@ private:
 
 	/*--ROBOT--*/
 	QTimer *timer_OBJECT;
-	QTimer *timer_PAIN;
 	bool idle_robot = false;
-
-	/*--TRACKING--*/
-
-	int k = 0;
-
-	double curent_X;
-	double curent_Y;
-	qint64 curent_T;
-
-	double last_X;
-	double last_Y;
-	qint64 last_T;
-
-	double V_x;
-	double V_y;
-
-	double Point0_X;
-	double Point0_Y;
-	double Point1_X;
-	double Point1_Y;
-
-
-	QElapsedTimer timer_TRACKING;
+	QString portName;
 
 };
 

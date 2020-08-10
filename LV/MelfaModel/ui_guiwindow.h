@@ -63,7 +63,6 @@ public:
     QVBoxLayout *verticalLayout_7;
     QPushButton *pushButton_Scan;
     QPushButton *pushButton_Stop;
-    QPushButton *pushButton_Paint;
     QVBoxLayout *verticalLayout_6;
     QPushButton *pushButton_Home;
     QPushButton *pushButton_Start;
@@ -248,24 +247,6 @@ public:
 "}"));
 
         verticalLayout_7->addWidget(pushButton_Stop);
-
-        pushButton_Paint = new QPushButton(layoutWidget);
-        pushButton_Paint->setObjectName(QStringLiteral("pushButton_Paint"));
-        sizePolicy.setHeightForWidth(pushButton_Paint->sizePolicy().hasHeightForWidth());
-        pushButton_Paint->setSizePolicy(sizePolicy);
-        pushButton_Paint->setMinimumSize(QSize(60, 0));
-        pushButton_Paint->setMaximumSize(QSize(60, 30));
-        pushButton_Paint->setStyleSheet(QLatin1String("#pushButton_Paint\n"
-"{\n"
-"color: white;\n"
-"border-width: 2px;\n"
-"border-style: solid;\n"
-"border-color:black;\n"
-"border-radius:10px;\n"
-"background-color:gray;\n"
-"}"));
-
-        verticalLayout_7->addWidget(pushButton_Paint);
 
 
         horizontalLayout->addLayout(verticalLayout_7);
@@ -489,7 +470,6 @@ public:
         label_Accelerate->setText(QApplication::translate("GuiWindow", "ACCERLERATE", Q_NULLPTR));
         pushButton_Scan->setText(QApplication::translate("GuiWindow", "SCAN", Q_NULLPTR));
         pushButton_Stop->setText(QApplication::translate("GuiWindow", "STOP", Q_NULLPTR));
-        pushButton_Paint->setText(QApplication::translate("GuiWindow", "Paint", Q_NULLPTR));
         pushButton_Home->setText(QApplication::translate("GuiWindow", "HOME", Q_NULLPTR));
         pushButton_Start->setText(QApplication::translate("GuiWindow", "START", Q_NULLPTR));
         pushButton_SetROI->setText(QApplication::translate("GuiWindow", "ROI", Q_NULLPTR));

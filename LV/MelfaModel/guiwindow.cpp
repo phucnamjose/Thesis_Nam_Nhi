@@ -15,7 +15,7 @@ const char* comboBox_Name[COMBOBOX_NUM] = { "comboBox_Comport","comboBox_Baudrat
 
 /*--Robot--*/
 double Zhigh = 120.0;
-double Zlow = 42.0;
+double Zlow = 36.0;
 double Xplace = 240;
 double Yplace = -170;
 double roll_place = -90;
@@ -38,9 +38,9 @@ float nmsThreshold = 0.5;  // Non-maximum suppression threshold
 int inpWidth = 416;        // Width of network's input image
 int inpHeight = 416;       // Height of network's input image
 // Calibration Params
-const double W11 = 156.144746, W12 = -213.655026;
-const double W21 = 0.0066893239, W22 = 0.707419968;
-const double W31 = 0.70189917, W32 = 0.0145513433;
+const double W11 = 144.606588, W12 = -225.306101;
+const double W21 = 0.024040891, W22 = 0.741709983;
+const double W31 = 0.730069443, W32 = 0.030124663;
 // ROI
 int count_mouse = 0;
 bool flag_ROI = false;
@@ -68,9 +68,6 @@ GuiWindow::GuiWindow(QWidget *parent) :
 	object = new Object();
 	timer_OBJECT = new QTimer(this);
 	connect(timer_OBJECT, &QTimer::timeout, this, &GuiWindow::timer_OBJECT_handle);
-	// Pain
-	timer_PAIN = new QTimer(this);
-	connect(timer_PAIN, &QTimer::timeout, this, &GuiWindow::timer_PAIN_handle);
 	
 }
 
@@ -101,8 +98,8 @@ bool GuiWindow::detectObject(Mat frame, Mat &out)
 												 //confidence
 		postProcess(matROI, outs); // get outs into frame
 		//imshow("Detect Object", matROI); // show frame to camera window
-out = matROI.clone();
-return true;
+		out = matROI.clone();
+		return true;
 	}
 	else
 	{
@@ -167,8 +164,6 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 
 				double x_absolute = W11 + W21*x_cam + W31*y_cam;
 				double y_absolute = W12 + W22*x_cam + W32*y_cam;
-				
-				ui->textEdit_Position->append(tr("X: %1 \nY: %2 \n").arg(x_cam).arg(y_cam));
 
 				X.push_back(x_absolute);
 				Y.push_back(y_absolute);
@@ -198,43 +193,15 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 			ANGLE_TRUE.push_back(angle);
 		}
 	}
-	if (ANGLE_TRUE.size() == 1)
-	{
-		if (k == 0)
-		{
-			timer_TRACKING.start();
-		}
-		curent_X = X_TRUE.at(0);
-		curent_Y = Y_TRUE.at(0);
-		curent_T = timer_TRACKING.elapsed();
 
-		if (k == 2)
-		{
-			Point0_X = curent_X;
-			Point0_Y = curent_Y;
-		}
-
-		if (k >= 2)
-		{
-			V_x = fabs((curent_X - last_X) / ((curent_T - last_T)*0.001));
-			V_y = fabs((curent_Y - last_Y) / ((curent_T - last_T)*0.001));
-		}
-
-		//----------------update---------
-		k++;
-		last_X = curent_X;
-		last_Y = curent_Y;
-		last_T = curent_T;
-	}
-
-	Point1_X = Point0_X + V_x*0.2;
-	Point1_Y = Point0_Y + V_y*0.2;
 
 	if (state_robot == STATE_READY)
 	{
 		for (int i = 0; i < ANGLE_TRUE.size(); i++)
 		{
 			object->addPosition(ID_TRUE.at(i), X_TRUE.at(i),
+				Y_TRUE.at(i), ANGLE_TRUE.at(i));
+			displayPosition(X_TRUE.at(i),
 				Y_TRUE.at(i), ANGLE_TRUE.at(i));
 		}
 	}
@@ -243,7 +210,7 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 // Draw the predicted bounding box
 bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right, int bottom, Mat& frame, double &angle)
 {
-	float W1 = 88.12453094, W2 = -1.00672202;
+	float W1 = 89.34795488, W2 = -1.00310605;
 	// BEFORE CUT IMAGE CONTAIN BOUNDING BOX
 	Mat imageCrop;
 	Rect2d r;
@@ -260,31 +227,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		&&  r.y + r.height <= frame.rows)
 	{
 		imageCrop = frame(r);
-		//flip(imageCrop, imageCrop, 1);
-		//imshow("magic", imageCrop); 
-		//**Convert image from BGR -> HSV**
-		
 		Mat gray;
 		cvtColor(imageCrop, gray, COLOR_BGR2GRAY);
-		
-		//Mat mask1, mask2;
-		/*inRange(hsv, Scalar(0, 120, 70), Scalar(10, 255, 255), mask1);
-		inRange(hsv, Scalar(170, 120, 70), Scalar(180, 255, 255), mask2);
-		/*mask1 = mask1 + mask2;
-		Mat kernel = Mat::ones(3, 3, CV_32F);
-		morphologyEx(mask1, mask1, cv::MORPH_OPEN, kernel);
-		morphologyEx(mask1, mask1, cv::MORPH_DILATE, kernel);
-		bitwise_not(mask1, mask2);
-		Mat res1, res2, final_output, background;
-		bitwise_and(imageCrop, imageCrop, res1, mask2);
-		bitwise_and(background, background, res2, mask1);
-		addWeighted(res1, 1, res2, 1, 0, final_output);
-		imshow("magic", final_output);*/
-	
-
-
-
-
 		//**Threshold**
 		Mat frame_threshold;
 		int max_value = 255;  
@@ -308,7 +252,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		
 		//**HoughLines**
 		vector<Vec4i> lines;
-		HoughLinesP(canny, lines, 1, CV_PI / 180, 30, 50, 10);
+		HoughLinesP(canny, lines, 1, CV_PI / 180, 30, 50, 5);
 
 		//**Draw a rectangle displaying the bounding box**
 		rectangle(frame, Point(left, top), Point(right, bottom), Scalar(255, 178, 50), 3);
@@ -380,8 +324,6 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		}
 		angle /= lines.size();
 		angle = W1 + (angle * 180 / CV_PI)*W2;
-
-		ui->textEdit_Position->append(tr("Angle: %1 \n").arg(angle));
 		imshow("Object", drawing);
 		return true;	
 	}
@@ -546,28 +488,28 @@ void GuiWindow::robotInit()
 }
 
 void GuiWindow::serial_openPort() {
-	if (controller->open(QIODevice::ReadWrite)) {
+	if (controller->isOpen()) {
+		controller->openComPort(portName);
 		timer_serial_comboBox->stop();
 		ui->comboBox_Baudrate->setEnabled(false);
 		ui->comboBox_Comport->setEnabled(false);
 		ui->pushButton_Connect->setText(tr("Disconnect"));
-		//ui->label_connectStatus->setText(tr("Connected"));
 	}
 	else {
-		QMessageBox::critical(this, tr("Error"), controller->errorString());
+		QMessageBox::critical(this, tr("Error"), "Close Comport SUCCESS");
 	}
 }
 
 void GuiWindow::serial_closePort() {
 	if (controller->isOpen()) {
-		controller->close();
+		controller->closeComPort();
 		ui->comboBox_Baudrate->setEnabled(true);
 		ui->comboBox_Comport->setEnabled(true);
 		ui->pushButton_Connect->setText("Connect");
 		timer_serial_comboBox->start(1000);
 	}
 	else {
-		QMessageBox::critical(this, tr("Error"), controller->errorString());
+		QMessageBox::critical(this, tr("Error"), "Close Comport FAIL");
 	}
 }
 
@@ -596,19 +538,13 @@ void GuiWindow::serial_updatePortName() {
 }
 
 void GuiWindow::serial_updateSetting() {
-	controller->setPortName(ui->comboBox_Comport->currentText());
-	controller->setBaudRate(static_cast<QSerialPort::BaudRate>
-		(ui->comboBox_Baudrate->itemData(ui->comboBox_Baudrate->currentIndex()).toInt()));
-	controller->setDataBits(QSerialPort::Data8);
-	controller->setParity(QSerialPort::NoParity);
-	controller->setStopBits(QSerialPort::OneStop);
-	controller->setFlowControl(QSerialPort::NoFlowControl);
+	portName = ui->comboBox_Comport->currentText();
 }
 
 void GuiWindow::serial_handleError(QSerialPort::SerialPortError error)
 {
 	if (error == QSerialPort::ResourceError) {
-		QMessageBox::critical(this, tr("Critical Error"), controller->errorString());
+		QMessageBox::critical(this, tr("Critical Error"), "Serial Error");
 		serial_closePort();
 	}
 }
@@ -798,6 +734,8 @@ void GuiWindow::gui_init()
 
 	connect(ui->sliderAccerlerate, &QAbstractSlider::valueChanged,
 		this, &GuiWindow::slide_Accelerate);
+
+	connect(controller, &RobotControll::updatePosition, this, &GuiWindow::updatePosition);
 }
 
 void GuiWindow::slide_Velocity()
@@ -833,10 +771,6 @@ void GuiWindow::on_pushButton_Scan_clicked()
 	controller->robotScanLimit();
 }
 
-void GuiWindow::on_pushButton_Paint_clicked() 
-{
-	timer_PAIN->start(50);
-}
 
 void GuiWindow::on_pushButton_Home_clicked()
 { 
@@ -912,17 +846,11 @@ void GuiWindow::displayPosition(double x, double y, double roll)
 	ui->textEdit_Position->append(tr("X: %1 \nY: %2 \nPhi: %3").arg(x).arg(y).arg(roll));
 }
 
-void GuiWindow::timer_PAIN_handle()
+void GuiWindow::updatePosition(double x, double y, double z, double roll,
+	double var0, double var1, double var2, double var3,
+	double lenght, double time_run, double time_total)
 {
-	if (controller->isScan())
-	{
-		double deg0, deg1, deg2, deg3;
-		deg0 = controller->getVar0();
-		deg1 = controller->getVar1();
-		deg2 = controller->getVar2();
-		deg3 = controller->getVar3();
-		ui->openGL->setAngle(deg0, deg1, deg2, deg3);
-		ui->textEdit_Inform->clear();
-		ui->textEdit_Inform->append(tr("%1 %2 %3 %4").arg(deg0).arg(deg1).arg(deg2).arg(deg3));
-	}
+	ui->openGL->setAngle(var0, var1, var2, var3);
+	ui->textEdit_Inform->clear();
+	ui->textEdit_Inform->append(tr("%1 %2 %3 %4").arg(var0).arg(var1).arg(var2).arg(var3));
 }
