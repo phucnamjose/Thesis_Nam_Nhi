@@ -143,7 +143,7 @@ void Link2::setupLightingAndMatrices()
     m_lightInfo.Position = QVector4D( -1.0f, 1.0f, 1.0f, 1.0f );
     m_lightInfo.Intensity = QVector3D( 1.0f, 1.0f, 1.0f);
 
-    m_materialInfo.Ambient = QVector3D( 0.05f, 0.2f, 0.05f ); // mau xung quanh
+	m_materialInfo.Ambient = QVector3D(0.05f, 0.05f, 0.2f);   // mau xung quanh
     m_materialInfo.Diffuse = QVector3D( 0.3f, 0.5f, 0.3f );   // mau khuech tan
     m_materialInfo.Specular = QVector3D( 0.6f, 0.6f, 0.6f );  // mau phan chieu
     m_materialInfo.Shininess = 50.0f;
@@ -185,9 +185,9 @@ void Link2::my_paintGL(int w_xRot, int w_yRot, int w_zRot, float w_scale, QMatri
   double alpha = 0.0f;
   degJ1 = qDegreesToRadians(degJ1);
   double c1 = cos(degJ1), s1 = sin(degJ1);
- m_DH = QMatrix4x4 (c1, -s1*cos(alpha), 0, L1*c1 ,
-                     s1, c1*cos(alpha), 0, L1*s1,
-                     0,  sin(alpha), cos(alpha) , d1,
+ m_DH = QMatrix4x4 (c1, -s1, 0, L1*c1 ,
+                     s1, c1, 0, L1*s1,
+                     0,  0,  1 , d1,
                      0,  0, 0, 1);
 
  /* m_DH = QMatrix4x4(c1, 0, -s1,L1*c1,

@@ -147,8 +147,8 @@ void Link3::setupLightingAndMatrices()
 //    m_materialInfo.Specular = QVector3D( 0.3f, 0.3f, 0.3f );  // mau phan chieu QVector3D( 0.6f, 0.6f, 0.6f );
 //    m_materialInfo.Shininess = 50.0f;                         // do sang bong (cang lon cang toi) 50.0f;
 
-    m_materialInfo.Ambient = QVector3D( 0.05f, 0.05f, 0.2f );   // mau xung quanh
-    m_materialInfo.Diffuse = QVector3D( 0.3f, 0.3f, 0.5f );   // mau khuech tan
+    m_materialInfo.Ambient = QVector3D( 0/255, 76/255, 153/255 );   // mau xung quanh
+    m_materialInfo.Diffuse = QVector3D( 0.3f, 0.3f, 0.6f );   // mau khuech tan
     m_materialInfo.Specular = QVector3D( 0.6f, 0.6f, 0.6f );  // mau phan chieu
     m_materialInfo.Shininess = 50.0f;
 }
@@ -187,10 +187,12 @@ void Link3::my_paintGL(int w_xRot, int w_yRot, int w_zRot, float w_scale, QMatri
     degJ2 = qDegreesToRadians(degJ2);
     double c1 = cos(degJ1), s1 = sin(degJ1);
     double c2 = cos(degJ2), s2 = sin(degJ2);
-    m_DH = QMatrix4x4 (c1*c2-s1*s2, -c1*s2-s1*c2, 0 , c1*L2*c2-s1*L2*s2+L1*c1,
-                       s1*c2+c1*s2, -s1*s2+c1*c2, 0, L2*s1*c2+c1*L2*s2+L1*s1,
-                       0, 0 ,1,d1,
-                       0, 0, 0, 1);
+	double c12 = cos(degJ1 + degJ2);
+	double s12 = sin(degJ1 + degJ2);
+    m_DH = QMatrix4x4 (c12, -s12, 0, L1*c1 + L2*c12,
+                       s12,  c12, 0, L1*s1 + L2*s12,
+                       0,      0, 1, d1,
+                       0,      0, 0, 1);
     /*m_DH = QMatrix4x4(c1*s2, c1*c2, -s1, a2*c1*s2,
                       s1*s2, c2*s1,  c1, a2*s1*s2,
                          c2,   -s2,   0, d1+a2*c2,

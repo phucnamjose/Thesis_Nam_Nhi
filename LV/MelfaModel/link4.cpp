@@ -142,9 +142,9 @@ void Link4::setupLightingAndMatrices()
     m_lightInfo.Intensity = QVector3D( 1.0f, 1.0f, 1.0f);
 
     // Color yellow
-    m_materialInfo.Ambient = QVector3D( 0.3f, 0.3f, 0.05f );
-    m_materialInfo.Diffuse = QVector3D( 0.4f, 0.4f, 0.3f );
-    m_materialInfo.Specular = QVector3D( 0.6f, 0.6f, 0.6f );
+	m_materialInfo.Ambient = QVector3D(0.05f, 0.05f, 0.2f);   // mau xung quanh
+	m_materialInfo.Diffuse = QVector3D(0.3f, 0.5f, 0.3f);   // mau khuech tan
+	m_materialInfo.Specular = QVector3D(0.6f, 0.6f, 0.6f);  // mau phan chieu
     m_materialInfo.Shininess = 50.0f;
 }
 
@@ -177,24 +177,25 @@ void Link4::my_paintGL(int w_xRot, int w_yRot, int w_zRot, float w_scale, QMatri
 
     // Calculate DH matrix
     /*double d1 = 0.3f, a2 = 0.25f, a3 = 0.16f;*/
-    double L2 = 0.16f,L1 = 0.197f, alpha = 0.0f, d1 = 0.211, d3=0.083;
+    double L2 = 0.16f,L1 = 0.197f, alpha = 0.0f, d1 = 0.211, d4=0.083;
     degJ1 = qDegreesToRadians(degJ1);
     degJ2 = qDegreesToRadians(degJ2);
     /*degJ3 = qDegreesToRadians(degJ3)*/;
-    d3=degJ3;
 
     double c1 = cos(degJ1), s1 = sin(degJ1);
     double c2 = cos(degJ2), s2 = sin(degJ2);
+	double c12 = cos(degJ1 + degJ2);
+	double s12 = sin(degJ1 + degJ2);
     //double c23 = cos(degJ2 + degJ3), s23 = sin(degJ2 + degJ3);
     /*m_DH = QMatrix4x4( c1*s23, c1*c23, -s1, c1*(a2*s2 + a3*s23),
                        s1*s23, c23*s1,  c1, s1*(a2*s2 + a3*s23),
                           c23,   -s23,   0, d1 + a2*c2 + a3*c23,
                            0,      0,   0,                   1);*/
 
-     m_DH = QMatrix4x4 (c1*c2-s1*s2,c1*s2+s1*c2,0,c1*L2*c2-s1*L2*s2+L1*c1,
-                        s1*c2+c1*s2,s1*s2-c1*c2,0,L2*s1*c2+c1*L2*s2+L1*s1,
-                        0,0,-1,d1-d3,
-                        0,0,0,1);
+     m_DH = QMatrix4x4 (c12, s12, 0, L1*c1 + L2*c12,
+                        s12, c12, 0, L1*s1 + L2*s12,
+                        0,     0, -1, d1-degJ3,
+                        0,     0, 0, 1);
     /*m_DH = QMatrix4x4 ( cos(degJ1+degJ2-degJ4),-sin(degJ1+degJ2-degJ4), 0, L1*cos(degJ1)+L2*cos(degJ1+degJ2),
                         sin(degJ1+degJ2-degJ4),cos(degJ1+degJ2-degJ4),0, L1*sin(degJ1)+L2*sin(degJ1+degJ2),
                         0,0,-1,d1-d3,

@@ -141,9 +141,9 @@ void Link1::setupLightingAndMatrices()
     m_lightInfo.Position = QVector4D( -1.0f, 1.0f, 1.0f, 1.0f );
     m_lightInfo.Intensity = QVector3D( 1.0f, 1.0f, 1.0f);
 
-    m_materialInfo.Ambient = QVector3D( 0.2f, 0.05f, 0.05f );
-    m_materialInfo.Diffuse = QVector3D( 0.5f, 0.3f, 0.3f );
-    m_materialInfo.Specular = QVector3D( 0.6f, 0.6f, 0.6f );
+	m_materialInfo.Ambient = QVector3D(0 / 255, 76 / 255, 153 / 255); // mau xung quanh
+	m_materialInfo.Diffuse = QVector3D(0.3f, 0.3f, 0.6f);   // mau khuech tan
+	m_materialInfo.Specular = QVector3D(0.6f, 0.6f, 0.6f);  // mau phan chieu
     m_materialInfo.Shininess = 50.0f;
 }
 

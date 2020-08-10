@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	string line;
 	while (getline(ifs, line)) classes.push_back(line);
 	String modelConfiguration = "C:\yolov3-tiny.cfg"; //duong dan
-	String modelWeights = "C:\yolov3-tiny_old1.weights";
+	String modelWeights = "C:\yolov3-tiny_old2.weights";
 	// Load the network
 	net = readNetFromDarknet(modelConfiguration, modelWeights); //doc 2 file nay
 	net.setPreferableBackend(DNN_BACKEND_OPENCV); //dua tren thu vien opencv

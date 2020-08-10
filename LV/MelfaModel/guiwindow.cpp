@@ -229,6 +229,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		imageCrop = frame(r);
 		Mat gray;
 		cvtColor(imageCrop, gray, COLOR_BGR2GRAY);
+		imshow(" gary ", gray);
 		//**Threshold**
 		Mat frame_threshold;
 		int max_value = 255;  
@@ -251,8 +252,10 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		//imshow("Canny", canny);
 		
 		//**HoughLines**
-		vector<Vec4i> lines;
-		HoughLinesP(canny, lines, 1, CV_PI / 180, 30, 50, 5);
+		vector<Vec4i> lines_angle;
+		vector<Vec4i> lines_intersection;
+		HoughLinesP(canny, lines_angle, 1, CV_PI / 180, 30, 50, 5);
+		HoughLinesP(canny, lines_intersection, 1, CV_PI / 180, 10, 10, 5);
 
 		//**Draw a rectangle displaying the bounding box**
 		rectangle(frame, Point(left, top), Point(right, bottom), Scalar(255, 178, 50), 3);
@@ -274,20 +277,87 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 
 		//Calculate arctan
 		Mat drawing = Mat::zeros(r.width, r.height, CV_8UC3);
+		Mat drawing_2 = Mat::zeros(r.width, r.height, CV_8UC3);
 		angle = 0;
 
-		if (lines.size() == 0 )
+		if (lines_angle.size() == 0)
 		{
 			return false;
 		}
-		
-		if (lines.size() >= 2)
+		// intersection
+		for (size_t i = 0; i < lines_intersection.size(); i++)
+		{
+			line(drawing_2, Point(lines_intersection[i][0], lines_intersection[i][1]),
+				Point(lines_intersection[i][2], lines_intersection[i][3]), Scalar(0, 0, 255), 1, LINE_8);
+		}
+		imshow("Object_2", drawing_2);
+
+		if (lines_intersection.size() >= 4)
 		{
 			vector<Vec3f> params(4);
-			for (size_t i = 0; i < lines.size(); i++)
+			for (size_t i = 0; i < lines_intersection.size(); i++)
 			{
-				params.push_back(calcParams(Point(lines[i][0], lines[i][1]),
-											Point(lines[i][2], lines[i][3])));
+				params.push_back(calcParams(Point(lines_intersection[i][0], lines_intersection[i][1]),
+					Point(lines_intersection[i][2], lines_intersection[i][3])));
+			}
+
+			vector<Point> corners;
+			for (int i = 0; i < params.size(); i++)
+			{
+				for (int j = i; j < params.size(); j++)
+				{
+					Point intersec = findIntersection(params[i], params[j]);
+					if ((intersec.x > 0)
+						&& (intersec.y > 0)
+						&& (intersec.x < canny.cols)
+						&& (intersec.y < canny.rows))
+					{
+						corners.push_back(intersec);
+					}
+				}
+			}
+
+			for (int i = 0; i < corners.size(); i++)
+			{
+				circle(drawing_2, corners[i], 3, Scalar(0, 255, 0));
+			}
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		// angle
+		/*if (lines_angle.size() >= 2)
+		{
+			vector<Vec3f> params(4);
+			for (size_t i = 0; i < lines_angle.size(); i++)
+			{
+				params.push_back(calcParams(Point(lines_angle[i][0], lines_angle[i][1]),
+											Point(lines_angle[i][2], lines_angle[i][3])));
 			}
 
 			vector<Point> corners;
@@ -316,16 +386,16 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 				return false;
 			}
 		}
-		for (size_t i = 0; i < lines.size(); i++)
+		for (size_t i = 0; i < lines_angle.size(); i++)
 		{
-			line(drawing, Point(lines[i][0], lines[i][1]),
-				Point(lines[i][2], lines[i][3]), Scalar(0, 0, 255), 1, LINE_8);
-			angle += atan2((double)lines[i][3] - lines[i][1], (double)lines[i][2] - lines[i][0]);
+			line(drawing, Point(lines_angle[i][0], lines_angle[i][1]),
+				Point(lines_angle[i][2], lines_angle[i][3]), Scalar(0, 0, 255), 1, LINE_8);
+			angle += atan2((double)lines_angle[i][3] - lines_angle[i][1], (double)lines_angle[i][2] - lines_angle[i][0]);
 		}
-		angle /= lines.size();
+		angle /= lines_angle.size();
 		angle = W1 + (angle * 180 / CV_PI)*W2;
-		imshow("Object", drawing);
-		return true;	
+		imshow("Object_1", drawing);
+		return true;	*/
 	}
 	return false;
 }
@@ -355,7 +425,7 @@ Vec3f GuiWindow::calcParams(Point2f p1, Point2f p2)
 
 Point  GuiWindow::findIntersection(Vec3f params1, Vec3f params2)
 {
-	float x = -1, y = -1;
+	float x, y;
 	float det = params1[0] * params2[1] - params2[0] * params1[1];
 	if (det < 0.5f && det > -0.5f) // lines are approximately parallel
 	{
@@ -488,7 +558,7 @@ void GuiWindow::robotInit()
 }
 
 void GuiWindow::serial_openPort() {
-	if (controller->isOpen()) {
+	if (!controller->isOpen()) {
 		controller->openComPort(portName);
 		timer_serial_comboBox->stop();
 		ui->comboBox_Baudrate->setEnabled(false);
@@ -559,15 +629,14 @@ void GuiWindow::pickAndPlace()
 			{
 				if (target.class_id == 0)
 				{
-					ui->textEdit_Position->append(tr("JAPAN"));
+					//ui->textEdit_Position->append(tr("JAPAN"));
 				}
 				else
 				{
-					ui->textEdit_Position->append(tr("VIETNAM"));
+					//ui->textEdit_Position->append(tr("VIETNAM"));
 				}
 				displayPosition(target.x, target.y, target.angle);
 				roll_pick = angleProcess(target.x, target.y, target.angle);
-				ui->textEdit_Position->append(tr("roll pick: %1 \n").arg(roll_pick));
 				if (roll_pick > 0)
 				{
 					roll_place = 90;
@@ -726,8 +795,21 @@ void GuiWindow::gui_init()
 	//Icon
 	QIcon Off("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_OFF.JPG");
 	ui->pushButton_StartCamera->setIcon(Off);
-	ui->pushButton_StartCamera->setIconSize(QSize(20, 20));
+	ui->pushButton_StartCamera->setIconSize(QSize(30, 30));
 	ui->pushButton_StartCamera->setCheckable(true);
+
+	QPixmap p1 = QPixmap("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/JP.JPG"); // load pixmap
+			   // get label dimensions
+	int w1 = ui->label_Japan->width();
+	int h1 = ui->label_Japan->height();
+	ui->label_Japan->setPixmap(p1.scaled(w1, h1, Qt::KeepAspectRatio));
+
+	QPixmap p2 = QPixmap("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/VN.JPG"); // load pixmap
+																			// get label dimensions
+	int w2 = ui->label_Vietnam->width();
+	int h2 = ui->label_Vietnam->height();
+	ui->label_Vietnam->setPixmap(p2.scaled(w2, h2, Qt::KeepAspectRatio));
+
 
 	connect(ui->sliderVelocity, &QAbstractSlider::valueChanged,
 		this, &GuiWindow::slide_Velocity);
@@ -779,10 +861,6 @@ void GuiWindow::on_pushButton_Home_clicked()
 	disconnect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
 	disconnect(controller, &RobotControll::commandDeny, this, &GuiWindow::overWorkSpace);
 	state_robot = STATE_READY;
-	//target_success_jp = 0;
-	//target_success_vn = 0;
-	//japan_full = false;
-	//vietnam_full = false;
 	object->clear();
 	controller->robotOutput(false);
 	controller->robotMoveHome();
@@ -843,7 +921,7 @@ void GuiWindow::on_pushButton_Vietnam_Full_clicked()
 
 void GuiWindow::displayPosition(double x, double y, double roll) 
 {
-	ui->textEdit_Position->append(tr("X: %1 \nY: %2 \nPhi: %3").arg(x).arg(y).arg(roll));
+	//ui->textEdit_Position->append(tr("X: %1 \nY: %2 \nPhi: %3").arg(x).arg(y).arg(roll));
 }
 
 void GuiWindow::updatePosition(double x, double y, double z, double roll,
