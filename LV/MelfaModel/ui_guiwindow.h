@@ -120,7 +120,6 @@ public:
     QPushButton *pushButton_SetROI;
     QGroupBox *groupBox_2;
     QLabel *label_Camera;
-    QTextEdit *textEdit_Waring;
     QTextEdit *textEdit_Inform;
     QWidget *layoutWidget1;
     QVBoxLayout *verticalLayout_5;
@@ -134,6 +133,7 @@ public:
     QPushButton *pushButton_Japan_Full;
     QPushButton *pushButton_Vietnam_Full;
     QPushButton *pushButton_StartCamera;
+    QTextEdit *textEdit_Waring;
     QWidget *tab_2;
     QMenuBar *menubar;
     QStatusBar *statusbar;
@@ -763,13 +763,6 @@ public:
         label_Camera->setFrameShape(QFrame::Box);
         label_Camera->setFrameShadow(QFrame::Raised);
         label_Camera->setLineWidth(5);
-        textEdit_Waring = new QTextEdit(groupBox_2);
-        textEdit_Waring->setObjectName(QStringLiteral("textEdit_Waring"));
-        textEdit_Waring->setGeometry(QRect(10, 240, 260, 80));
-        sizePolicy.setHeightForWidth(textEdit_Waring->sizePolicy().hasHeightForWidth());
-        textEdit_Waring->setSizePolicy(sizePolicy);
-        textEdit_Waring->setMinimumSize(QSize(0, 80));
-        textEdit_Waring->setMaximumSize(QSize(260, 80));
         textEdit_Inform = new QTextEdit(groupBox_2);
         textEdit_Inform->setObjectName(QStringLiteral("textEdit_Inform"));
         textEdit_Inform->setGeometry(QRect(10, 330, 260, 80));
@@ -867,6 +860,9 @@ public:
         sizePolicy.setHeightForWidth(pushButton_StartCamera->sizePolicy().hasHeightForWidth());
         pushButton_StartCamera->setSizePolicy(sizePolicy);
         pushButton_StartCamera->setMaximumSize(QSize(20, 20));
+        textEdit_Waring = new QTextEdit(groupBox_2);
+        textEdit_Waring->setObjectName(QStringLiteral("textEdit_Waring"));
+        textEdit_Waring->setGeometry(QRect(10, 230, 261, 91));
         tabWidget->addTab(tab, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));

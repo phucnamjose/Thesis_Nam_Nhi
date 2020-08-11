@@ -1,5 +1,6 @@
 #include "robotcontroll.hpp"
-
+#include <qdebug.h>
+#include <qthread.h>
 // Constructor
 RobotControll::RobotControll(QObject *parent):QObject(parent)
 {
@@ -20,11 +21,9 @@ bool RobotControll::unPackData(QByteArray &data)
 {
    // qDebug() << "unpack thread is:" << QThread::currentThreadId();
     if(data.isNull() || data.isEmpty()) {
-        M_DEBUG("data input is null");
         return false;
     }
     if(data.at(0) != START_CHAR || data.at(data.length()-1) != END_CHAR) {
-        M_DEBUG("begin or end charater wrong");
         return false;
     }
     QByteArray temp;
@@ -52,11 +51,9 @@ void RobotControll::readData() {
             data_read.remove(0, data_read.indexOf(END_CHAR) +1);
             // Unpack Payload
             if ( this->unPackData(temp) == false ) {
-                M_DEBUG("unpack fail");
                 continue;
             }
             if (!processRespond(temp)) {
-                M_DEBUG("error frame");
                 continue;
             }
         }
@@ -177,13 +174,10 @@ bool RobotControll::setCommand(robotCommand_t cmd, const QString para) {
     }
     command_pack.append(command);
     if(writeData(command_pack) == false) {
-        M_DEBUG("write data fail");
-        Debug::_delete(command);
         return false;
     }
     emit commandSend(command);    // Set Signal
     id_command++;
-    Debug::_delete(command);
     return true;
 }
 
@@ -191,7 +185,6 @@ bool RobotControll::setCommand(robotCommand_t cmd, const QString para) {
 bool RobotControll::packData(QByteArray &data)
 {
     if(data.isNull() || data.isEmpty()) {
-        M_DEBUG("data input is empty");
         return false;
     }
     // packing
@@ -201,8 +194,6 @@ bool RobotControll::packData(QByteArray &data)
     temp.push_back((char)END_CHAR);
     data.clear();
     data.append(temp);
-
-    Debug::_delete(temp);
     return true;
 }
 
@@ -212,12 +203,10 @@ bool RobotControll::writeData(QByteArray &data) {
     if(portOpen) {
         // Pack Payload
         if( this->packData(data) == false ) {
-            M_DEBUG("pack fail");
             return false;
         }
         emit main_sendThroughSerial(data);
     } else {
-        M_DEBUG("no device");
         return false;
     }
     return true;

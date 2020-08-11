@@ -15,7 +15,7 @@ const char* comboBox_Name[COMBOBOX_NUM] = { "comboBox_Comport","comboBox_Baudrat
 
 /*--Robot--*/
 double Zhigh = 120.0;
-double Zlow = 36.0;
+double Zlow = 38;
 double Xplace = 240;
 double Yplace = -170;
 double roll_place = -90;
@@ -159,14 +159,6 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 				int left = x_roi - width / 2;
 				int top = y_roi - height / 2;
 
-				int x_cam = x_roi + x_pos[0];
-				int y_cam = y_roi + y_pos[0];
-
-				double x_absolute = W11 + W21*x_cam + W31*y_cam;
-				double y_absolute = W12 + W22*x_cam + W32*y_cam;
-
-				X.push_back(x_absolute);
-				Y.push_back(y_absolute);
 				classIds.push_back(classIdPoint.x);
 				confidences.push_back((float)confidence);
 				boxes.push_back(Rect(left, top, width, height));
@@ -182,15 +174,22 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 	for (size_t i = 0; i < indices.size(); ++i)
 	{
 		double angle;
+		double x, y;
 		int idx = indices[i];
 		Rect box = boxes[idx];
 		if (drawPred(classIds[idx], confidences[idx], box.x, box.y,
-			box.x + box.width, box.y + box.height, frame, angle))
+			box.x + box.width, box.y + box.height, frame, angle, x ,y))
 		{
 			ID_TRUE.push_back(classIds.at(idx));
-			X_TRUE.push_back(X.at(idx));
-			Y_TRUE.push_back(Y.at(idx));
+			x = x + x_pos[0];
+			y = y + y_pos[0];
+			double x_absolute = W11 + W21*x + W31*y;
+			double y_absolute = W12 + W22*x + W32*y;
+			X_TRUE.push_back(x_absolute);
+			Y_TRUE.push_back(y_absolute);
 			ANGLE_TRUE.push_back(angle);
+			ui->textEdit_Inform->insertPlainText(tr("Thiet = %1 %2")
+				.arg(x_absolute).arg(y_absolute));
 		}
 	}
 
@@ -208,8 +207,10 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 }
 
 // Draw the predicted bounding box
-bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right, int bottom, Mat& frame, double &angle)
+bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right, int bottom, 
+				Mat& frame, double &angle, double &x, double &y)
 {
+	ui->textEdit_Inform->clear();
 	float W1 = 89.34795488, W2 = -1.00310605;
 	// BEFORE CUT IMAGE CONTAIN BOUNDING BOX
 	Mat imageCrop;
@@ -218,7 +219,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 	r.y = top - 10;
 	r.width = right - left + 20;  //right-left is %d //r.width  is float 
 	r.height = bottom - top + 20;
-
+	//ui->textEdit_Inform->insertPlainText(tr("width: %1 pixel\n").arg(right - left));
+	//ui->textEdit_Inform->insertPlainText(tr("height: %1 pixel\n").arg(bottom - top));
 	if (r.x >= 0
 		&& r.y >= 0
 		&& r.width >= 0
@@ -229,7 +231,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		imageCrop = frame(r);
 		Mat gray;
 		cvtColor(imageCrop, gray, COLOR_BGR2GRAY);
-		imshow(" gary ", gray);
+		//imshow(" gray ", gray);
 		//**Threshold**
 		Mat frame_threshold;
 		int max_value = 255;  
@@ -249,12 +251,24 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		//**Detect edges using canny**
 		Mat canny;
 		Canny(frame_filter, canny, 300, 600, 3);
-		//imshow("Canny", canny);
+		imshow("Canny", canny);
 		
 		//**HoughLines**
 		vector<Vec4i> lines_angle;
 		vector<Vec4i> lines_intersection;
+		vector<Vec3f> params_angle;
+		vector<Vec3f> params_intersection;
+		vector<Point> corners_angle;
+		vector<Point> corners_intersection;
+		vector<Point> corners_line1;
+		vector<Point> corners_line2;
+		vector<Point> corners_group1;
+		vector<Point> corners_group2;
+		vector<Point> corners_group3;
+		vector<Point> corners_group4;
+		// 2 line
 		HoughLinesP(canny, lines_angle, 1, CV_PI / 180, 30, 50, 5);
+		// 4 line
 		HoughLinesP(canny, lines_intersection, 1, CV_PI / 180, 10, 10, 5);
 
 		//**Draw a rectangle displaying the bounding box**
@@ -272,130 +286,241 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		int baseLine;
 		Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
 		top = max(top, labelSize.height);
-		rectangle(frame, Point(left, top - round(labelSize.height)), Point(left + round(labelSize.width), top + baseLine), Scalar(255, 255, 255), FILLED);
+		rectangle(frame, Point(left, top - round(labelSize.height)),
+					Point(left + round(labelSize.width), top + baseLine), Scalar(255, 255, 255), FILLED);
 		putText(frame, label, Point(left, top), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 0), 1);
 
 		//Calculate arctan
-		Mat drawing = Mat::zeros(r.width, r.height, CV_8UC3);
-		Mat drawing_2 = Mat::zeros(r.width, r.height, CV_8UC3);
+		Mat drawing = Mat::zeros(r.height, r.width, CV_8UC3);
+		Mat drawing_2 = Mat::zeros(r.height, r.width, CV_8UC3);
 		angle = 0;
-
-		if (lines_angle.size() == 0)
+		/*---  Angle  ---*/
+		if (lines_angle.size()  <= 1)
 		{
 			return false;
 		}
-		// intersection
-		for (size_t i = 0; i < lines_intersection.size(); i++)
+		else
 		{
-			line(drawing_2, Point(lines_intersection[i][0], lines_intersection[i][1]),
-				Point(lines_intersection[i][2], lines_intersection[i][3]), Scalar(0, 0, 255), 1, LINE_8);
-		}
-		imshow("Object_2", drawing_2);
-
-		if (lines_intersection.size() >= 4)
-		{
-			vector<Vec3f> params(4);
-			for (size_t i = 0; i < lines_intersection.size(); i++)
-			{
-				params.push_back(calcParams(Point(lines_intersection[i][0], lines_intersection[i][1]),
-					Point(lines_intersection[i][2], lines_intersection[i][3])));
-			}
-
-			vector<Point> corners;
-			for (int i = 0; i < params.size(); i++)
-			{
-				for (int j = i; j < params.size(); j++)
-				{
-					Point intersec = findIntersection(params[i], params[j]);
-					if ((intersec.x > 0)
-						&& (intersec.y > 0)
-						&& (intersec.x < canny.cols)
-						&& (intersec.y < canny.rows))
-					{
-						corners.push_back(intersec);
-					}
-				}
-			}
-
-			for (int i = 0; i < corners.size(); i++)
-			{
-				circle(drawing_2, corners[i], 3, Scalar(0, 255, 0));
-			}
-		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		// angle
-		/*if (lines_angle.size() >= 2)
-		{
-			vector<Vec3f> params(4);
 			for (size_t i = 0; i < lines_angle.size(); i++)
 			{
-				params.push_back(calcParams(Point(lines_angle[i][0], lines_angle[i][1]),
-											Point(lines_angle[i][2], lines_angle[i][3])));
+				params_angle.push_back(calcParams(Point(lines_angle[i][0], lines_angle[i][1]),
+					Point(lines_angle[i][2], lines_angle[i][3])));
 			}
 
-			vector<Point> corners;
-			for (int i = 0; i < params.size(); i++)
+			for (int i = 0; i < params_angle.size(); i++)
 			{
-				for (int j = i; j < params.size(); j++)
+				for (int j = i; j < params_angle.size(); j++)
 				{
-					Point intersec = findIntersection(params[i], params[j]);
+					Point intersec = findIntersection(params_angle[i], params_angle[j]);
 					if ((intersec.x > 0)
 						&& (intersec.y > 0)
 						&& (intersec.x < canny.cols)
 						&& (intersec.y < canny.rows))
 					{
-						corners.push_back(intersec);
+						corners_angle.push_back(intersec);
 					}
 				}
 			}
 
-			for (int i = 0; i < corners.size(); i++)
-			{
-				circle(drawing, corners[i], 3, Scalar(0, 255, 0));
-			}
-
-			if (corners.size() != 0)
+			// Check corners is exist
+			if (corners_angle.size() != 0)
 			{
 				return false;
 			}
 		}
+		// Compute angle thought atan2
 		for (size_t i = 0; i < lines_angle.size(); i++)
 		{
-			line(drawing, Point(lines_angle[i][0], lines_angle[i][1]),
-				Point(lines_angle[i][2], lines_angle[i][3]), Scalar(0, 0, 255), 1, LINE_8);
-			angle += atan2((double)lines_angle[i][3] - lines_angle[i][1], (double)lines_angle[i][2] - lines_angle[i][0]);
+			if (i == 0) {
+				line(drawing, Point(lines_angle[i][0], lines_angle[i][1]),
+					Point(lines_angle[i][2], lines_angle[i][3]), Scalar(255, 255, 255), 1, LINE_8);
+			}
+			else
+			{
+				line(drawing, Point(lines_angle[i][0], lines_angle[i][1]),
+					Point(lines_angle[i][2], lines_angle[i][3]), Scalar(0, 0, 255), 1, LINE_8);
+			}
+			angle += atan2((double)lines_angle[i][3] - lines_angle[i][1],
+				(double)lines_angle[i][2] - lines_angle[i][0]);
 		}
 		angle /= lines_angle.size();
 		angle = W1 + (angle * 180 / CV_PI)*W2;
-		imshow("Object_1", drawing);
-		return true;	*/
+
+		/*-- Intersection --*/
+		if (lines_intersection.size() < 4)
+		{
+			return false;
+		}
+		else
+		{
+			for (size_t i = 0; i < lines_intersection.size(); i++)
+			{
+				line(drawing_2, Point(lines_intersection[i][0], lines_intersection[i][1]),
+					Point(lines_intersection[i][2], lines_intersection[i][3]), Scalar(0, 0, 255), 1, LINE_8);
+				params_intersection.push_back(calcParams(Point(lines_intersection[i][0], lines_intersection[i][1]),
+					Point(lines_intersection[i][2], lines_intersection[i][3])));
+			}
+
+			for (int i = 0; i < params_intersection.size(); i++)
+			{
+				for (int j = i; j < params_intersection.size(); j++)
+				{
+					Point intersec = findIntersection(params_intersection[i], params_intersection[j]);
+					if ((intersec.x > 0)
+						&& (intersec.y > 0)
+						&& (intersec.x < canny.cols)
+						&& (intersec.y < canny.rows))
+					{
+						corners_intersection.push_back(intersec);
+					}
+				}
+			}
+			ui->textEdit_Inform->insertPlainText(tr("Corner: %1 point\n").arg(corners_intersection.size()));
+			
+			if (corners_intersection.size() < 4)
+			{
+				return false;
+			}
+
+			
+			
+			for (int j = 0; j < corners_intersection.size(); j++)
+			{
+				double distance;
+				distance = disPoint2Line(params_angle.at(0), corners_intersection.at(j));
+				if (distance < 5)
+				{
+					corners_line1.push_back(corners_intersection.at(j));
+					
+				}
+				else
+				{
+					corners_line2.push_back(corners_intersection.at(j));
+				
+				}
+			}
+			ui->textEdit_Inform->insertPlainText(tr("line 1: %1 point\n").arg(corners_line1.size()));
+			ui->textEdit_Inform->insertPlainText(tr("line 2: %1 point\n").arg(corners_line2.size()));
+			// Line 1
+			corners_group1.push_back(corners_line1.at(0));
+			for (int i = 1; i < corners_line1.size(); i++)
+			{
+				double distance;
+				distance = disPoint2Point(corners_line1.at(0), corners_line1.at(i));
+				if (distance < 5)
+				{
+					corners_group1.push_back(corners_line1.at(i));	
+				}
+				else if (distance > 49)
+				{
+					corners_group2.push_back(corners_line1.at(i));	
+				}
+			}
+
+			// Line 2
+			corners_group3.push_back(corners_line2.at(0));
+			for (int i = 1; i < corners_line2.size(); i++)
+			{
+				double distance;
+				distance = disPoint2Point(corners_line2.at(0), corners_line2.at(i));
+				if (distance < 5)
+				{
+					corners_group3.push_back(corners_line2.at(i));
+				}
+				else if (distance > 49 && distance < 58)
+				{
+					corners_group4.push_back(corners_line2.at(i));	
+				}
+			}
+			float sum_x1 = 0, sum_y1 = 0, sum_x2 = 0, sum_y2 = 0;
+			float sum_x3 = 0, sum_y3 = 0, sum_x4 = 0, sum_y4 = 0, sum_xCenter = 0, sum_yCenter = 0;
+			float avr_x1, avr_y1, avr_x2, avr_y2, avr_x3, avr_y3, avr_x4, avr_y4, avr_xCenter, avr_yCenter;
+			// Group 1
+			for (int i = 0; i < corners_group1.size(); i++)
+			{ 
+				Point point = corners_group1.at(i);
+				sum_x1 += point.x;
+				sum_y1 += point.y;
+				circle(drawing, corners_group1[i], 3, Scalar(204, 0, 102));
+			}
+			// Group 2
+			for (int i = 0; i < corners_group2.size(); i++)
+			{
+				Point point = corners_group2.at(i);
+				sum_x2 += point.x;
+				sum_y2 += point.y;
+				circle(drawing, corners_group2[i], 3, Scalar(51, 102, 0));
+			}
+			// Group 3
+			for (int i = 0; i < corners_group3.size(); i++)
+			{
+				Point point = corners_group3.at(i);
+				sum_x3 += point.x;
+				sum_y3 += point.y;
+				circle(drawing, corners_group3[i], 3, Scalar(255, 153, 0));
+			}
+			// Group 4
+			for (int i = 0; i < corners_group4.size(); i++)
+			{
+				Point point = corners_group4.at(i);
+				sum_x4 += point.x;
+				sum_y4 += point.y;
+				circle(drawing, corners_group4[i], 3, Scalar(0, 0, 200));
+			}
+
+			if (corners_group1.size() == 0
+				|| corners_group2.size() == 0
+				|| corners_group3.size() == 0
+				|| corners_group4.size() == 0)
+			{
+				return false;
+			}
+
+			avr_x1 = sum_x1 / corners_group1.size();
+			avr_y1 = sum_y1 / corners_group1.size();
+			avr_x2 = sum_x2 / corners_group2.size();
+			avr_y2 = sum_y2 / corners_group2.size();
+			avr_x3 = sum_x3 / corners_group3.size();
+			avr_y3 = sum_y3 / corners_group3.size();
+			avr_x4 = sum_x4 / corners_group4.size();
+			avr_y4 = sum_y4 / corners_group4.size();
+			//-----------^ o ^-------------
+			avr_xCenter = (avr_x1 + avr_x2 + avr_x3 + avr_x4) / 4;
+			avr_yCenter = (avr_y1 + avr_y2 + avr_y3 + avr_y4) / 4;
+
+			//ui->textEdit_Inform->insertPlainText(tr("Center = %1 %2 \n")
+				//.arg(avr_xCenter).arg(avr_yCenter));
+
+			Point A, B, C, D, Center;
+			A.x = int(avr_x1);
+			A.y = int(avr_y1);
+			B.x = int(avr_x2);
+			B.y = int(avr_y2);
+			C.x = int(avr_x3);
+			C.y = int(avr_y3);
+			D.x = int(avr_x4);
+			D.y = int(avr_y4);
+			Center.x = int(avr_xCenter);
+			Center.y = int(avr_yCenter);
+
+			//circle(drawing_2, A, 3, Scalar(204, 0, 102));
+			//circle(drawing_2, B, 3, Scalar(51, 102, 0));
+			//circle(drawing_2, C, 3, Scalar(255, 153, 0));
+			//circle(drawing_2, D, 3, Scalar(0, 0, 200));
+			circle(drawing, Center, 3, Scalar(255, 255, 255));
+
+			//ui->textEdit_Inform->insertPlainText(tr("Pixel = %1 %2")
+				//.arg(Center.x).arg(Center.y));
+
+			x = avr_xCenter + r.x;
+			y = avr_yCenter + r.y;
+
+
+			imshow("Object_1", drawing);
+			imshow("Object_2", drawing_2);
+
+		}
+		return true;
 	}
 	return false;
 }
@@ -439,6 +564,23 @@ Point  GuiWindow::findIntersection(Vec3f params1, Vec3f params2)
 	return(Point(x, y));
 }
 
+double GuiWindow::disPoint2Point(Point A, Point B)
+{
+	double dx, dy, distance;
+	dx = A.x - B.x;
+	dy = A.y - B.y;
+	distance = sqrt(dx*dx + dy*dy);
+	return distance;
+}
+
+double GuiWindow::disPoint2Line(Vec3f param, Point A)
+{
+	double num, den, distance;
+	num = fabs(param[0] * A.x + param[1] * A.y + param[2]);
+	den = sqrt(param[0] * param[0] + param[1] * param[1]);
+	distance = num / den;
+	return distance;
+}
 
 void GuiWindow::moveJoint(double centerX, double centerY, double Z, double roll)
 {
@@ -517,7 +659,7 @@ void GuiWindow::showCamera(cv::Mat img, QImage::Format format)
 void GuiWindow::timer_CAM_handle()
 {
 	showFrame(true);
-	timer_CAM->start(500);
+	//timer_CAM->start(500);
 }
 
 void GuiWindow::timer_OBJECT_handle()
@@ -537,6 +679,7 @@ void GuiWindow::timer_OBJECT_handle()
 		}
 	}
 }
+
 /*--ROBOT--*/
 void GuiWindow::robotInit() 
 {
@@ -709,7 +852,8 @@ void GuiWindow::pickAndPlace()
 			{
 				controller->robotOutput(false);
 				output_robot = false;
-				pickAndPlace(); // khong co command work done, phải gọi pickAndPlace tiep, tang len state_up2
+				pickAndPlace(); 
+				// khong co command work done, phải gọi pickAndPlace tiep, tang len state_up2
 			}
 		break;
 
@@ -735,7 +879,7 @@ void GuiWindow::pickAndPlace()
 					target_success_jp++;
 					if (target_success_jp == 5)
 					{
-						ui->textEdit_Waring->append("WARNING: FULL JAPAN COLLUMN");
+						ui->textEdit_Waring->insertPlainText("WARNING: FULL JAPAN COLLUMN");
 						japan_full = true;
 					}	
 				}
@@ -744,7 +888,7 @@ void GuiWindow::pickAndPlace()
 					target_success_vn++;
 					if (target_success_vn == 5)
 					{
-						ui->textEdit_Waring->append("WARNING: FULL VIETNAM COLLUMN");
+						ui->textEdit_Waring->insertPlainText("WARNING: FULL VIETNAM COLLUMN");
 						vietnam_full = true;
 					}
 				}
@@ -760,37 +904,19 @@ void GuiWindow::pickAndPlace()
 
 void GuiWindow::overWorkSpace()
 {
-	ui->textEdit_Inform->insertPlainText("ERROR: Over workspace");
-	ui->textEdit_Inform->insertPlainText("Skip Point:");
-	ui->textEdit_Inform->insertPlainText(tr("X: %1\n Y: %2\n Phi: %3\n")
+	ui->textEdit_Waring->insertPlainText("ERROR: Over workspace");
+	ui->textEdit_Waring->insertPlainText("Skip Point:");
+	ui->textEdit_Waring->insertPlainText(tr("X: %1\n Y: %2\n Phi: %3\n")
 							.arg(target.x).arg(target.y).arg(target.angle));
 	object->deletePosition(0);
 	disconnect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
 	state_robot = STATE_READY;
 }
 
-double GuiWindow::angleProcess(double x, double y, double angle)
-{
-	if (x > 250 && fabs(angle) > 90) 
-	{
-		if (angle > 0)
-		{
-			return (angle - 180);
-		}
-		else
-		{
-			return (180 + angle);
-		}
-	}
-	else
-	{
-		return angle;
-	}
-}
-/*--GUI--*/
 void GuiWindow::gui_init()
 {
-	ui->textEdit_Inform->ensureCursorVisible();
+	ui->textEdit_Waring->ensureCursorVisible();
+	ui->textEdit_Waring->ensureCursorVisible();
 
 	//Icon
 	QIcon Off("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_OFF.JPG");
@@ -837,26 +963,26 @@ void GuiWindow::on_pushButton_Connect_clicked()
 {
 	if (ui->pushButton_Connect->text() == "Connect")
 	{ 
-		ui->textEdit_Waring->setText("WARNING: Robot is connecting");
+		ui->textEdit_Waring->insertPlainText("WARNING: Robot is connecting\n");
 		serial_openPort();
 	}
 	else 
 	{
-		ui->textEdit_Waring->setText("WARNING: Robot is disconnecting");
+		ui->textEdit_Waring->insertPlainText("WARNING: Robot is disconnecting\n");
 		serial_closePort();
 	}
 }
 
 void GuiWindow::on_pushButton_Scan_clicked()
 {
-	ui->textEdit_Waring->setText("WARNING: Robot is scanning");
+	ui->textEdit_Waring->insertPlainText("WARNING: Robot is scanning");
 	controller->robotScanLimit();
 }
 
 
 void GuiWindow::on_pushButton_Home_clicked()
 { 
-	ui->textEdit_Waring->setText("WARNING: Robot is at home status");
+	ui->textEdit_Waring->insertPlainText("WARNING: Robot is at home status");
 	timer_OBJECT->stop();
 	disconnect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
 	disconnect(controller, &RobotControll::commandDeny, this, &GuiWindow::overWorkSpace);
@@ -869,7 +995,7 @@ void GuiWindow::on_pushButton_Home_clicked()
 
 void  GuiWindow::on_pushButton_Stop_clicked()
 {
-	ui->textEdit_Waring->setText("WARNING: Robot is stopping");
+	ui->textEdit_Waring->insertPlainText("WARNING: Robot is stopping");
 	timer_OBJECT->stop();
 }
 
@@ -880,7 +1006,7 @@ void GuiWindow::on_pushButton_StartCamera_toggled(bool checked)
 		QIcon On("F:/HANH_NHI/Thesis_Nam_Nhi/LV/MelfaModel/Capture_ON.JPG");
 		ui->pushButton_StartCamera->setIcon(On);
 		ui->pushButton_StartCamera->setIconSize(QSize(20, 20));
-		timer_CAM->start(500);
+		timer_CAM->start(200);
 	}
 	else
 	{
@@ -903,7 +1029,7 @@ void GuiWindow::on_pushButton_SetROI_clicked()
 
 void GuiWindow::on_pushButton_Start_clicked()
 {
-	ui->textEdit_Waring->setText("WARNING: Robot is starting");
+	ui->textEdit_Waring->insertPlainText("WARNING: Robot is starting");
 	timer_OBJECT->start(200);
 }
 
@@ -911,12 +1037,14 @@ void GuiWindow::on_pushButton_Japan_Full_clicked()
 {
 	japan_full = false;
 	target_success_jp = 0;
+	ui->textEdit_Waring->insertPlainText("JAPAN COL IS CLEAR");
 }
 
 void GuiWindow::on_pushButton_Vietnam_Full_clicked()
 {
 	vietnam_full = false;
 	target_success_vn = 0;
+	ui->textEdit_Waring->insertPlainText("VIETNAM COL IS CLEAR");
 }
 
 void GuiWindow::displayPosition(double x, double y, double roll) 
@@ -929,6 +1057,33 @@ void GuiWindow::updatePosition(double x, double y, double z, double roll,
 	double lenght, double time_run, double time_total)
 {
 	ui->openGL->setAngle(var0, var1, var2, var3);
-	ui->textEdit_Inform->clear();
-	ui->textEdit_Inform->append(tr("%1 %2 %3 %4").arg(var0).arg(var1).arg(var2).arg(var3));
+	ui->textEdit_Japan_Num->setText(tr("%1").arg(target_success_jp));
+	ui->textEdit_Vietnam_Num->setText(tr("%1").arg(target_success_vn));
+	ui->textEdit_X->setText(tr("%1").arg(x));
+	ui->textEdit_Y->setText(tr("%1").arg(y));
+	ui->textEdit_Z->setText(tr("%1").arg(z));
+	ui->textEdit_Roll->setText(tr("%1").arg(roll));
+	ui->textEdit_Theta1->setText(tr("%1").arg(var0));
+	ui->textEdit_Theta2->setText(tr("%1").arg(var1));
+	ui->textEdit_D3->setText(tr("%1").arg(var2));
+	ui->textEdit_Theta4->setText(tr("%1").arg(var3));
+}
+
+double GuiWindow::angleProcess(double x, double y, double angle)
+{
+	if (x > 250 && fabs(angle) > 90)
+	{
+		if (angle > 0)
+		{
+			return (angle - 180);
+		}
+		else
+		{
+			return (180 + angle);
+		}
+	}
+	else
+	{
+		return angle;
+	}
 }

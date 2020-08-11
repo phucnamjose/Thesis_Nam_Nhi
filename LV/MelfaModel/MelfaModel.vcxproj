@@ -204,7 +204,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="box.cpp" />
-    <ClCompile Include="debug.cpp" />
     <ClCompile Include="guiwindow.cpp" />
     <ClCompile Include="link1.cpp" />
     <ClCompile Include="link2.cpp" />
@@ -221,7 +220,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="box.h" />
-    <ClInclude Include="debug.hpp" />
     <ClInclude Include="object_detect.h" />
     <QtMoc Include="serialport.hpp" />
     <QtMoc Include="robotcontroll.hpp" />

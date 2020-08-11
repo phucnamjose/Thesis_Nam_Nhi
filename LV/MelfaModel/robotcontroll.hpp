@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <sstream>
-#include "debug.hpp"
 #include "serialport.hpp"
 
 #define  START_CHAR         (0x28)

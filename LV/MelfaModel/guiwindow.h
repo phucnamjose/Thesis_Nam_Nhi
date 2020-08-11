@@ -61,11 +61,14 @@ private:
 	void postProcess(cv::Mat& frame, const std::vector<cv::Mat>& outs);
 
 	// Draw the predicted bounding box
-	bool drawPred(int classId, double conf, int left, int top, int right, int bottom, cv::Mat& frame, double &angle);
+	bool drawPred(int classId, double conf, int left, int top, int right, int bottom,
+					cv::Mat& frame, double &angle, double &x, double &y);
 	void showFrame(bool dynamic);
 	void showCamera(cv::Mat img, QImage::Format format);
 	Vec3f calcParams(Point2f p1, Point2f p2);
 	Point findIntersection(Vec3f params1, Vec3f params2);
+	double disPoint2Line(Vec3f param, Point A);
+	double disPoint2Point(Point A, Point B);
 
 	// Select ROI
 	void selectROI(cv::Mat frame, cv::Mat &matROI);
