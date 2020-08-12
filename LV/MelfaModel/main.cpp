@@ -23,12 +23,12 @@ int main(int argc, char *argv[])
 		return(0);
 	}
 	// Load names of classes
-	string classesFile = "C:\custom.names"; //chuoi ten file 
+	string classesFile = "C:/custom.names"; //chuoi ten file 
 	ifstream ifs(classesFile.c_str()); // 
 	string line;
 	while (getline(ifs, line)) classes.push_back(line);
-	String modelConfiguration = "C:\yolov3-tiny.cfg"; //duong dan
-	String modelWeights = "C:\yolov3-tiny_old2.weights";
+	String modelConfiguration = "C:/yolov3-tiny.cfg"; //duong dan
+	String modelWeights = "C:/yolov3-tiny_old2.weights";
 	// Load the network
 	net = readNetFromDarknet(modelConfiguration, modelWeights); //doc 2 file nay
 	net.setPreferableBackend(DNN_BACKEND_OPENCV); //dua tren thu vien opencv

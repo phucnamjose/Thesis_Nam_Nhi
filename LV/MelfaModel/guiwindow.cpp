@@ -82,8 +82,9 @@ bool GuiWindow::detectObject(Mat frame, Mat &out)
 {
 	if (flag_ROI)
 	{
-		Mat matROI;
+		Mat matROI, matSHOW;
 		selectROI(frame, matROI);
+		matSHOW = matROI.clone();	
 		// Create a 4D blob from a frame.
 		blobFromImage(matROI, blob, 1 / 255.0, Size(inpWidth, inpHeight),
 						Scalar(0, 0, 0), true, false);// tao ra blob tu hinh input 
@@ -96,9 +97,9 @@ bool GuiWindow::detectObject(Mat frame, Mat &out)
 		net.forward(outs, getOutputsNames(net)); //chay mang noron
 												 // Remove the bounding boxes with low 
 												 //confidence
-		postProcess(matROI, outs); // get outs into frame
+		postProcess(matROI, matSHOW, outs); // get outs into frame
 		//imshow("Detect Object", matROI); // show frame to camera window
-		out = matROI.clone();
+		out = matSHOW.clone();
 		return true;
 	}
 	else
@@ -129,7 +130,7 @@ vector<String>  getOutputsNames(const Net& net)
 	return names;
 }
 
-void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
+void GuiWindow::postProcess(Mat& frame, Mat& show, const vector<Mat>& outs)
 {
 	vector<double> X, Y, ANGLE_TRUE, X_TRUE, Y_TRUE;
 	vector<int> classIds, ID_TRUE;
@@ -178,7 +179,7 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 		int idx = indices[i];
 		Rect box = boxes[idx];
 		if (drawPred(classIds[idx], confidences[idx], box.x, box.y,
-			box.x + box.width, box.y + box.height, frame, angle, x ,y))
+			box.x + box.width, box.y + box.height, frame, show, angle, x ,y))
 		{
 			ID_TRUE.push_back(classIds.at(idx));
 			x = x + x_pos[0];
@@ -208,7 +209,7 @@ void GuiWindow::postProcess(Mat& frame, const vector<Mat>& outs)
 
 // Draw the predicted bounding box
 bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right, int bottom, 
-				Mat& frame, double &angle, double &x, double &y)
+				Mat& frame, Mat& show, double &angle, double &x, double &y)
 {
 	ui->textEdit_Inform->clear();
 	float W1 = 89.34795488, W2 = -1.00310605;
@@ -219,6 +220,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 	r.y = top - 10;
 	r.width = right - left + 20;  //right-left is %d //r.width  is float 
 	r.height = bottom - top + 20;
+
+
 	//ui->textEdit_Inform->insertPlainText(tr("width: %1 pixel\n").arg(right - left));
 	//ui->textEdit_Inform->insertPlainText(tr("height: %1 pixel\n").arg(bottom - top));
 	if (r.x >= 0
@@ -229,6 +232,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		&&  r.y + r.height <= frame.rows)
 	{
 		imageCrop = frame(r);
+		//imshow("imageCrop", imageCrop);
 		Mat gray;
 		cvtColor(imageCrop, gray, COLOR_BGR2GRAY);
 		//imshow(" gray ", gray);
@@ -250,7 +254,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 	
 		//**Detect edges using canny**
 		Mat canny;
-		Canny(frame_filter, canny, 300, 600, 3);
+		Canny(frame_filter, canny, 400, 600, 3);
 		imshow("Canny", canny);
 		
 		//**HoughLines**
@@ -266,13 +270,15 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		vector<Point> corners_group2;
 		vector<Point> corners_group3;
 		vector<Point> corners_group4;
+		Vec3f param_vuong1;
+		Vec3f param_vuong2;
 		// 2 line
-		HoughLinesP(canny, lines_angle, 1, CV_PI / 180, 30, 50, 5);
+		HoughLinesP(canny, lines_angle, 1, CV_PI / 180, 30, 45, 5);
 		// 4 line
-		HoughLinesP(canny, lines_intersection, 1, CV_PI / 180, 10, 10, 5);
+		HoughLinesP(canny, lines_intersection, 1, CV_PI / 180, 10, 8, 5);
 
 		//**Draw a rectangle displaying the bounding box**
-		rectangle(frame, Point(left, top), Point(right, bottom), Scalar(255, 178, 50), 3);
+		rectangle(show, Point(left, top), Point(right, bottom), Scalar(255, 178, 50), 3);
 
 		//Get the label for the class name and its confidence
 		string label = format("%.2f", conf);
@@ -286,17 +292,20 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		int baseLine;
 		Size labelSize = getTextSize(label, FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
 		top = max(top, labelSize.height);
-		rectangle(frame, Point(left, top - round(labelSize.height)),
+		rectangle(show, Point(left, top - round(labelSize.height)),
 					Point(left + round(labelSize.width), top + baseLine), Scalar(255, 255, 255), FILLED);
-		putText(frame, label, Point(left, top), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 0), 1);
+		putText(show, label, Point(left, top), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0, 0, 0), 1);
 
 		//Calculate arctan
-		Mat drawing = Mat::zeros(r.height, r.width, CV_8UC3);
-		Mat drawing_2 = Mat::zeros(r.height, r.width, CV_8UC3);
+		Mat drawing = Mat::zeros(100, 100, CV_8UC3);
+		Mat drawing_2 = Mat::zeros(100, 100, CV_8UC3);
 		angle = 0;
 		/*---  Angle  ---*/
-		if (lines_angle.size()  <= 1)
+		if (lines_angle.size()  < 1)
 		{
+			ui->textEdit_Inform->insertPlainText("Return line size < 1");
+			imshow("Object_1", drawing);
+			imshow("Object_2", drawing_2);
 			return false;
 		}
 		else
@@ -325,6 +334,9 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 			// Check corners is exist
 			if (corners_angle.size() != 0)
 			{
+				ui->textEdit_Inform->insertPlainText("Return corners angle size =! 0");
+				imshow("Object_1", drawing);
+				imshow("Object_2", drawing_2);
 				return false;
 			}
 		}
@@ -349,6 +361,9 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		/*-- Intersection --*/
 		if (lines_intersection.size() < 4)
 		{
+			ui->textEdit_Inform->insertPlainText("Return line intersec < 4");
+			imshow("Object_1", drawing);
+			imshow("Object_2", drawing_2);
 			return false;
 		}
 		else
@@ -360,6 +375,9 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 				params_intersection.push_back(calcParams(Point(lines_intersection[i][0], lines_intersection[i][1]),
 					Point(lines_intersection[i][2], lines_intersection[i][3])));
 			}
+			line(drawing_2, Point(lines_angle[0][0], lines_angle[0][1]),
+				Point(lines_angle[0][2], lines_angle[0][3]), Scalar(255, 255, 255), 1, LINE_8);
+			circle(drawing_2, Point(lines_angle[0][0], lines_angle[0][1]), 3, Scalar(255, 255, 255));
 
 			for (int i = 0; i < params_intersection.size(); i++)
 			{
@@ -376,62 +394,89 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 				}
 			}
 			ui->textEdit_Inform->insertPlainText(tr("Corner: %1 point\n").arg(corners_intersection.size()));
-			
-			if (corners_intersection.size() < 4)
+
+			for (int i = 0; i < corners_intersection.size(); i++)
 			{
-				return false;
+				circle(drawing, corners_intersection[i], 3, Scalar(255,255,255));
 			}
 
 			
-			
+			if (corners_intersection.size() < 4)
+			{
+				ui->textEdit_Inform->insertPlainText("Return corner_intersec < 4");
+				imshow("Object_1", drawing);
+				imshow("Object_2", drawing_2);
+				return false;
+			}
+			//---------------
 			for (int j = 0; j < corners_intersection.size(); j++)
 			{
 				double distance;
 				distance = disPoint2Line(params_angle.at(0), corners_intersection.at(j));
-				if (distance < 5)
+				if (distance < thres_line_1)
 				{
-					corners_line1.push_back(corners_intersection.at(j));
-					
+					corners_line1.push_back(corners_intersection.at(j));	
 				}
-				else
+				else if(distance > thres_line_2_low && distance < thres_line_2_up)
 				{
 					corners_line2.push_back(corners_intersection.at(j));
-				
 				}
 			}
 			ui->textEdit_Inform->insertPlainText(tr("line 1: %1 point\n").arg(corners_line1.size()));
 			ui->textEdit_Inform->insertPlainText(tr("line 2: %1 point\n").arg(corners_line2.size()));
 			// Line 1
-			corners_group1.push_back(corners_line1.at(0));
-			for (int i = 1; i < corners_line1.size(); i++)
+			if ( corners_line1.size() == 0)
 			{
-				double distance;
-				distance = disPoint2Point(corners_line1.at(0), corners_line1.at(i));
-				if (distance < 5)
+				ui->textEdit_Inform->insertPlainText("Return line 1 = 0");
+				imshow("Object_1", drawing);
+				imshow("Object_2", drawing_2);
+				return false;
+			}
+			for (int i = 0; i < corners_line1.size(); i++)
+			{
+				double distance_1, distance_2;
+				distance_1 = disPoint2Point(Point(lines_angle[0][0], lines_angle[0][1]), corners_line1.at(i));
+				distance_2 = disPoint2Point(Point(lines_angle[0][2], lines_angle[0][3]), corners_line1.at(i));
+				if (distance_1 < thres_group_1)
 				{
 					corners_group1.push_back(corners_line1.at(i));	
 				}
-				else if (distance > 49)
+				else if (distance_2 < thres_group_1)
 				{
 					corners_group2.push_back(corners_line1.at(i));	
 				}
 			}
-
+			ui->textEdit_Inform->insertPlainText(tr("group 1: %1 point\n").arg(corners_group1.size()));
+			ui->textEdit_Inform->insertPlainText(tr("group 2: %1 point\n").arg(corners_group2.size()));
 			// Line 2
-			corners_group3.push_back(corners_line2.at(0));
-			for (int i = 1; i < corners_line2.size(); i++)
+			// pt 2 duong chieu rong
+			param_vuong1 = vuongParams(params_angle.at(0), Point(lines_angle[0][0], lines_angle[0][1]));
+			param_vuong2 = vuongParams(params_angle.at(0), Point(lines_angle[0][2], lines_angle[0][3]));
+
+			if (corners_line2.size() == 0)
 			{
-				double distance;
-				distance = disPoint2Point(corners_line2.at(0), corners_line2.at(i));
-				if (distance < 5)
+				ui->textEdit_Inform->insertPlainText("Return line 2 = 0");
+				imshow("Object_1", drawing);
+				imshow("Object_2", drawing_2);
+				return false;
+			}
+			for (int i = 0; i < corners_line2.size(); i++)
+			{
+				double distance_1, distance_2;
+				distance_1 = disPoint2Line(param_vuong1, corners_line2.at(i));
+				distance_2 = disPoint2Line(param_vuong2, corners_line2.at(i));
+				if (distance_1 < thres_group_1)
 				{
 					corners_group3.push_back(corners_line2.at(i));
 				}
-				else if (distance > 49 && distance < 58)
+				else if (distance_2 < thres_group_1)
 				{
 					corners_group4.push_back(corners_line2.at(i));	
 				}
 			}
+			ui->textEdit_Inform->insertPlainText(tr("group 3: %1 point\n").arg(corners_group3.size()));
+			ui->textEdit_Inform->insertPlainText(tr("group 4: %1 point\n").arg(corners_group4.size()));
+
 			float sum_x1 = 0, sum_y1 = 0, sum_x2 = 0, sum_y2 = 0;
 			float sum_x3 = 0, sum_y3 = 0, sum_x4 = 0, sum_y4 = 0, sum_xCenter = 0, sum_yCenter = 0;
 			float avr_x1, avr_y1, avr_x2, avr_y2, avr_x3, avr_y3, avr_x4, avr_y4, avr_xCenter, avr_yCenter;
@@ -441,7 +486,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 				Point point = corners_group1.at(i);
 				sum_x1 += point.x;
 				sum_y1 += point.y;
-				circle(drawing, corners_group1[i], 3, Scalar(204, 0, 102));
+				circle(drawing_2, corners_group1[i], 3, Scalar(204, 0, 102));
 			}
 			// Group 2
 			for (int i = 0; i < corners_group2.size(); i++)
@@ -449,7 +494,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 				Point point = corners_group2.at(i);
 				sum_x2 += point.x;
 				sum_y2 += point.y;
-				circle(drawing, corners_group2[i], 3, Scalar(51, 102, 0));
+				circle(drawing_2, corners_group2[i], 3, Scalar(51, 102, 0));
 			}
 			// Group 3
 			for (int i = 0; i < corners_group3.size(); i++)
@@ -457,7 +502,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 				Point point = corners_group3.at(i);
 				sum_x3 += point.x;
 				sum_y3 += point.y;
-				circle(drawing, corners_group3[i], 3, Scalar(255, 153, 0));
+				circle(drawing_2, corners_group3[i], 3, Scalar(255, 153, 0));
 			}
 			// Group 4
 			for (int i = 0; i < corners_group4.size(); i++)
@@ -465,7 +510,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 				Point point = corners_group4.at(i);
 				sum_x4 += point.x;
 				sum_y4 += point.y;
-				circle(drawing, corners_group4[i], 3, Scalar(0, 0, 200));
+				circle(drawing_2, corners_group4[i], 3, Scalar(0, 0, 200));
 			}
 
 			if (corners_group1.size() == 0
@@ -473,6 +518,9 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 				|| corners_group3.size() == 0
 				|| corners_group4.size() == 0)
 			{
+				ui->textEdit_Inform->insertPlainText("1 group = 0");
+				imshow("Object_1", drawing);
+				imshow("Object_2", drawing_2);
 				return false;
 			}
 
@@ -503,11 +551,13 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 			Center.x = int(avr_xCenter);
 			Center.y = int(avr_yCenter);
 
-			//circle(drawing_2, A, 3, Scalar(204, 0, 102));
-			//circle(drawing_2, B, 3, Scalar(51, 102, 0));
-			//circle(drawing_2, C, 3, Scalar(255, 153, 0));
-			//circle(drawing_2, D, 3, Scalar(0, 0, 200));
-			circle(drawing, Center, 3, Scalar(255, 255, 255));
+			//circle(drawing_2, A, 3, Scalar(255, 255, 255));
+			//circle(drawing_2, B, 3, Scalar(255, 255, 255));
+			//circle(drawing_2, C, 3, Scalar(255, 255, 255));
+			//circle(drawing_2, D, 3, Scalar(255, 255, 255));
+			//circle(drawing_2, Center, 3, Scalar(255, 255, 255));
+			circle(drawing, Center, 3, Scalar(0, 255, 255));
+			circle(drawing_2, Center, 3, Scalar(0, 255, 255));
 
 			//ui->textEdit_Inform->insertPlainText(tr("Pixel = %1 %2")
 				//.arg(Center.x).arg(Center.y));
@@ -518,6 +568,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 
 			imshow("Object_1", drawing);
 			imshow("Object_2", drawing_2);
+			
 
 		}
 		return true;
@@ -580,6 +631,15 @@ double GuiWindow::disPoint2Line(Vec3f param, Point A)
 	den = sqrt(param[0] * param[0] + param[1] * param[1]);
 	distance = num / den;
 	return distance;
+}
+
+Vec3f GuiWindow::vuongParams(Vec3f delta, Point2f A)
+{
+	float a, b, c;
+	a = delta[1];
+	b = -delta[0];
+	c = -a * A.x - b * A.y;
+	return(Vec3f(a, b, c));
 }
 
 void GuiWindow::moveJoint(double centerX, double centerY, double Z, double roll)
@@ -772,14 +832,16 @@ void GuiWindow::pickAndPlace()
 			{
 				if (target.class_id == 0)
 				{
-					//ui->textEdit_Position->append(tr("JAPAN"));
+					ui->textEdit_Class->setText("JAPAN");
 				}
 				else
 				{
-					//ui->textEdit_Position->append(tr("VIETNAM"));
+					ui->textEdit_Class->setText("VIETNAM");
 				}
-				displayPosition(target.x, target.y, target.angle);
+				ui->textEdit_X_Object->setText(tr("%1").arg(target.x));
+				ui->textEdit_Y_Object->setText(tr("%1").arg(target.y));
 				roll_pick = angleProcess(target.x, target.y, target.angle);
+				ui->textEdit_Roll_Object->setText(tr("%1").arg(roll_pick));
 				if (roll_pick > 0)
 				{
 					roll_place = 90;
@@ -879,7 +941,7 @@ void GuiWindow::pickAndPlace()
 					target_success_jp++;
 					if (target_success_jp == 5)
 					{
-						ui->textEdit_Waring->insertPlainText("WARNING: FULL JAPAN COLLUMN");
+						ui->textEdit_Waring->insertPlainText("WARNING: FULL JAPAN COLLUMN\n");
 						japan_full = true;
 					}	
 				}
@@ -888,7 +950,7 @@ void GuiWindow::pickAndPlace()
 					target_success_vn++;
 					if (target_success_vn == 5)
 					{
-						ui->textEdit_Waring->insertPlainText("WARNING: FULL VIETNAM COLLUMN");
+						ui->textEdit_Waring->insertPlainText("WARNING: FULL VIETNAM COLLUMN\n");
 						vietnam_full = true;
 					}
 				}
@@ -904,8 +966,8 @@ void GuiWindow::pickAndPlace()
 
 void GuiWindow::overWorkSpace()
 {
-	ui->textEdit_Waring->insertPlainText("ERROR: Over workspace");
-	ui->textEdit_Waring->insertPlainText("Skip Point:");
+	ui->textEdit_Waring->insertPlainText("ERROR: Over workspace\n");
+	ui->textEdit_Waring->insertPlainText("Skip Point:\n");
 	ui->textEdit_Waring->insertPlainText(tr("X: %1\n Y: %2\n Phi: %3\n")
 							.arg(target.x).arg(target.y).arg(target.angle));
 	object->deletePosition(0);
@@ -975,14 +1037,14 @@ void GuiWindow::on_pushButton_Connect_clicked()
 
 void GuiWindow::on_pushButton_Scan_clicked()
 {
-	ui->textEdit_Waring->insertPlainText("WARNING: Robot is scanning");
+	ui->textEdit_Waring->insertPlainText("WARNING: Robot is scanning\n");
 	controller->robotScanLimit();
 }
 
 
 void GuiWindow::on_pushButton_Home_clicked()
 { 
-	ui->textEdit_Waring->insertPlainText("WARNING: Robot is at home status");
+	ui->textEdit_Waring->insertPlainText("WARNING: Robot is at home status\n");
 	timer_OBJECT->stop();
 	disconnect(controller, &RobotControll::commandWorkDone, this, &GuiWindow::pickAndPlace);
 	disconnect(controller, &RobotControll::commandDeny, this, &GuiWindow::overWorkSpace);
@@ -995,7 +1057,7 @@ void GuiWindow::on_pushButton_Home_clicked()
 
 void  GuiWindow::on_pushButton_Stop_clicked()
 {
-	ui->textEdit_Waring->insertPlainText("WARNING: Robot is stopping");
+	ui->textEdit_Waring->insertPlainText("WARNING: Robot is stopping\n");
 	timer_OBJECT->stop();
 }
 
@@ -1029,7 +1091,7 @@ void GuiWindow::on_pushButton_SetROI_clicked()
 
 void GuiWindow::on_pushButton_Start_clicked()
 {
-	ui->textEdit_Waring->insertPlainText("WARNING: Robot is starting");
+	ui->textEdit_Waring->insertPlainText("WARNING: Robot is starting\n");
 	timer_OBJECT->start(200);
 }
 
@@ -1037,14 +1099,14 @@ void GuiWindow::on_pushButton_Japan_Full_clicked()
 {
 	japan_full = false;
 	target_success_jp = 0;
-	ui->textEdit_Waring->insertPlainText("JAPAN COL IS CLEAR");
+	ui->textEdit_Waring->insertPlainText("JAPAN COL IS CLEAR\n");
 }
 
 void GuiWindow::on_pushButton_Vietnam_Full_clicked()
 {
 	vietnam_full = false;
 	target_success_vn = 0;
-	ui->textEdit_Waring->insertPlainText("VIETNAM COL IS CLEAR");
+	ui->textEdit_Waring->insertPlainText("VIETNAM COL IS CLEAR\n");
 }
 
 void GuiWindow::displayPosition(double x, double y, double roll) 
@@ -1067,6 +1129,19 @@ void GuiWindow::updatePosition(double x, double y, double z, double roll,
 	ui->textEdit_Theta2->setText(tr("%1").arg(var1));
 	ui->textEdit_D3->setText(tr("%1").arg(var2));
 	ui->textEdit_Theta4->setText(tr("%1").arg(var3));
+
+	ui->horizontalSlider_var0->setValue(1000 * ((var0 - -85) / (85 - -85)));
+	ui->horizontalSlider_var1->setValue(1000 * ((var1 - -135) / (135 - -135)));
+	ui->horizontalSlider_var2->setValue(1000 * ((var2 - 0) / (100 - 0)));
+	ui->horizontalSlider_var3->setValue(1000 * ((var3 - -170) / (170 - -170)));
+}
+
+void GuiWindow::on_pushButton_Change_clicked()
+{
+	thres_line_1 = ui->textEdit_Line1->toPlainText().toDouble();
+	thres_line_2_low = ui->textEdit_Line2_low->toPlainText().toDouble();
+	thres_line_2_up = ui->textEdit_Line2_up->toPlainText().toDouble();
+	thres_group_1 = ui->textEdit_Group1->toPlainText().toDouble();
 }
 
 double GuiWindow::angleProcess(double x, double y, double angle)
@@ -1087,3 +1162,4 @@ double GuiWindow::angleProcess(double x, double y, double angle)
 		return angle;
 	}
 }
+

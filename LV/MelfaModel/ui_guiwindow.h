@@ -56,20 +56,6 @@ public:
     QVBoxLayout *verticalLayout_15;
     QLabel *label_Theta4;
     QTextEdit *textEdit_Theta4;
-    QWidget *layoutWidget_2;
-    QHBoxLayout *horizontalLayout_XYZ_target_2;
-    QVBoxLayout *verticalLayout_10;
-    QLabel *label_X_2;
-    QTextEdit *textEdit_X;
-    QVBoxLayout *verticalLayout_11;
-    QLabel *label_Y_2;
-    QTextEdit *textEdit_Y;
-    QVBoxLayout *verticalLayout_12;
-    QLabel *label_Z_2;
-    QTextEdit *textEdit_Z;
-    QVBoxLayout *verticalLayout_22;
-    QLabel *label_Roll_2;
-    QTextEdit *textEdit_Roll;
     QWidget *layoutWidget_5;
     QVBoxLayout *verticalLayout_slider;
     QHBoxLayout *horizontalLayout_11;
@@ -92,6 +78,35 @@ public:
     QLabel *label_var3_min;
     QSlider *horizontalSlider_var3;
     QLabel *label_var3_max;
+    QWidget *layoutWidget_2;
+    QHBoxLayout *horizontalLayout_XYZ_target_2;
+    QVBoxLayout *verticalLayout_10;
+    QLabel *label_X_2;
+    QTextEdit *textEdit_X;
+    QVBoxLayout *verticalLayout_11;
+    QLabel *label_Y_2;
+    QTextEdit *textEdit_Y;
+    QVBoxLayout *verticalLayout_12;
+    QLabel *label_Z_2;
+    QTextEdit *textEdit_Z;
+    QVBoxLayout *verticalLayout_22;
+    QLabel *label_Roll_2;
+    QTextEdit *textEdit_Roll;
+    QGroupBox *groupBox_4;
+    QWidget *layoutWidget_8;
+    QHBoxLayout *horizontalLayout_XYZ_target_4;
+    QVBoxLayout *verticalLayout_26;
+    QLabel *label_X_4;
+    QTextEdit *textEdit_X_Object;
+    QVBoxLayout *verticalLayout_27;
+    QLabel *label_Y_4;
+    QTextEdit *textEdit_Y_Object;
+    QVBoxLayout *verticalLayout_30;
+    QLabel *label_Roll_5;
+    QTextEdit *textEdit_Class;
+    QVBoxLayout *verticalLayout_29;
+    QLabel *label_Roll_4;
+    QTextEdit *textEdit_Roll_Object;
     QGroupBox *groupBox;
     QWidget *layoutWidget;
     QHBoxLayout *horizontalLayout;
@@ -120,7 +135,6 @@ public:
     QPushButton *pushButton_SetROI;
     QGroupBox *groupBox_2;
     QLabel *label_Camera;
-    QTextEdit *textEdit_Inform;
     QWidget *layoutWidget1;
     QVBoxLayout *verticalLayout_5;
     QHBoxLayout *horizontalLayout_8;
@@ -134,7 +148,19 @@ public:
     QPushButton *pushButton_Vietnam_Full;
     QPushButton *pushButton_StartCamera;
     QTextEdit *textEdit_Waring;
+    QTextEdit *textEdit_Inform;
     QWidget *tab_2;
+    QWidget *tab_3;
+    QGroupBox *groupBox_3;
+    QPushButton *pushButton_Change;
+    QTextEdit *textEdit_Group1;
+    QLabel *label_10;
+    QTextEdit *textEdit_Line2_up;
+    QLabel *label_9;
+    QLabel *label_11;
+    QTextEdit *textEdit_Line1;
+    QLabel *label_12;
+    QTextEdit *textEdit_Line2_low;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -160,7 +186,7 @@ public:
         groupBox_Information->setGeometry(QRect(10, 10, 671, 141));
         layoutWidget_3 = new QWidget(groupBox_Information);
         layoutWidget_3->setObjectName(QStringLiteral("layoutWidget_3"));
-        layoutWidget_3->setGeometry(QRect(20, 80, 308, 56));
+        layoutWidget_3->setGeometry(QRect(20, 20, 308, 56));
         horizontalLayout_Joint_var = new QHBoxLayout(layoutWidget_3);
         horizontalLayout_Joint_var->setObjectName(QStringLiteral("horizontalLayout_Joint_var"));
         horizontalLayout_Joint_var->setSizeConstraint(QLayout::SetFixedSize);
@@ -266,105 +292,6 @@ public:
 
 
         horizontalLayout_Joint_var->addLayout(verticalLayout_15);
-
-        layoutWidget_2 = new QWidget(groupBox_Information);
-        layoutWidget_2->setObjectName(QStringLiteral("layoutWidget_2"));
-        layoutWidget_2->setGeometry(QRect(20, 20, 308, 56));
-        horizontalLayout_XYZ_target_2 = new QHBoxLayout(layoutWidget_2);
-        horizontalLayout_XYZ_target_2->setObjectName(QStringLiteral("horizontalLayout_XYZ_target_2"));
-        horizontalLayout_XYZ_target_2->setSizeConstraint(QLayout::SetFixedSize);
-        horizontalLayout_XYZ_target_2->setContentsMargins(0, 0, 0, 0);
-        verticalLayout_10 = new QVBoxLayout();
-        verticalLayout_10->setObjectName(QStringLiteral("verticalLayout_10"));
-        label_X_2 = new QLabel(layoutWidget_2);
-        label_X_2->setObjectName(QStringLiteral("label_X_2"));
-        sizePolicy.setHeightForWidth(label_X_2->sizePolicy().hasHeightForWidth());
-        label_X_2->setSizePolicy(sizePolicy);
-        label_X_2->setMaximumSize(QSize(70, 20));
-        label_X_2->setFont(font);
-
-        verticalLayout_10->addWidget(label_X_2);
-
-        textEdit_X = new QTextEdit(layoutWidget_2);
-        textEdit_X->setObjectName(QStringLiteral("textEdit_X"));
-        sizePolicy.setHeightForWidth(textEdit_X->sizePolicy().hasHeightForWidth());
-        textEdit_X->setSizePolicy(sizePolicy);
-        textEdit_X->setMaximumSize(QSize(70, 32));
-        textEdit_X->setFont(font1);
-
-        verticalLayout_10->addWidget(textEdit_X);
-
-
-        horizontalLayout_XYZ_target_2->addLayout(verticalLayout_10);
-
-        verticalLayout_11 = new QVBoxLayout();
-        verticalLayout_11->setObjectName(QStringLiteral("verticalLayout_11"));
-        label_Y_2 = new QLabel(layoutWidget_2);
-        label_Y_2->setObjectName(QStringLiteral("label_Y_2"));
-        sizePolicy.setHeightForWidth(label_Y_2->sizePolicy().hasHeightForWidth());
-        label_Y_2->setSizePolicy(sizePolicy);
-        label_Y_2->setMaximumSize(QSize(70, 20));
-        label_Y_2->setFont(font);
-
-        verticalLayout_11->addWidget(label_Y_2);
-
-        textEdit_Y = new QTextEdit(layoutWidget_2);
-        textEdit_Y->setObjectName(QStringLiteral("textEdit_Y"));
-        sizePolicy.setHeightForWidth(textEdit_Y->sizePolicy().hasHeightForWidth());
-        textEdit_Y->setSizePolicy(sizePolicy);
-        textEdit_Y->setMaximumSize(QSize(70, 32));
-        textEdit_Y->setFont(font1);
-
-        verticalLayout_11->addWidget(textEdit_Y);
-
-
-        horizontalLayout_XYZ_target_2->addLayout(verticalLayout_11);
-
-        verticalLayout_12 = new QVBoxLayout();
-        verticalLayout_12->setObjectName(QStringLiteral("verticalLayout_12"));
-        label_Z_2 = new QLabel(layoutWidget_2);
-        label_Z_2->setObjectName(QStringLiteral("label_Z_2"));
-        sizePolicy.setHeightForWidth(label_Z_2->sizePolicy().hasHeightForWidth());
-        label_Z_2->setSizePolicy(sizePolicy);
-        label_Z_2->setMaximumSize(QSize(70, 20));
-        label_Z_2->setFont(font);
-
-        verticalLayout_12->addWidget(label_Z_2);
-
-        textEdit_Z = new QTextEdit(layoutWidget_2);
-        textEdit_Z->setObjectName(QStringLiteral("textEdit_Z"));
-        sizePolicy.setHeightForWidth(textEdit_Z->sizePolicy().hasHeightForWidth());
-        textEdit_Z->setSizePolicy(sizePolicy);
-        textEdit_Z->setMaximumSize(QSize(70, 32));
-        textEdit_Z->setFont(font1);
-
-        verticalLayout_12->addWidget(textEdit_Z);
-
-
-        horizontalLayout_XYZ_target_2->addLayout(verticalLayout_12);
-
-        verticalLayout_22 = new QVBoxLayout();
-        verticalLayout_22->setObjectName(QStringLiteral("verticalLayout_22"));
-        label_Roll_2 = new QLabel(layoutWidget_2);
-        label_Roll_2->setObjectName(QStringLiteral("label_Roll_2"));
-        sizePolicy.setHeightForWidth(label_Roll_2->sizePolicy().hasHeightForWidth());
-        label_Roll_2->setSizePolicy(sizePolicy);
-        label_Roll_2->setMaximumSize(QSize(70, 20));
-        label_Roll_2->setFont(font);
-
-        verticalLayout_22->addWidget(label_Roll_2);
-
-        textEdit_Roll = new QTextEdit(layoutWidget_2);
-        textEdit_Roll->setObjectName(QStringLiteral("textEdit_Roll"));
-        sizePolicy.setHeightForWidth(textEdit_Roll->sizePolicy().hasHeightForWidth());
-        textEdit_Roll->setSizePolicy(sizePolicy);
-        textEdit_Roll->setMaximumSize(QSize(70, 32));
-        textEdit_Roll->setFont(font1);
-
-        verticalLayout_22->addWidget(textEdit_Roll);
-
-
-        horizontalLayout_XYZ_target_2->addLayout(verticalLayout_22);
 
         layoutWidget_5 = new QWidget(groupBox_Information);
         layoutWidget_5->setObjectName(QStringLiteral("layoutWidget_5"));
@@ -513,6 +440,207 @@ public:
 
 
         verticalLayout_slider->addLayout(horizontalLayout_14);
+
+        layoutWidget_2 = new QWidget(groupBox_Information);
+        layoutWidget_2->setObjectName(QStringLiteral("layoutWidget_2"));
+        layoutWidget_2->setGeometry(QRect(20, 80, 308, 56));
+        horizontalLayout_XYZ_target_2 = new QHBoxLayout(layoutWidget_2);
+        horizontalLayout_XYZ_target_2->setObjectName(QStringLiteral("horizontalLayout_XYZ_target_2"));
+        horizontalLayout_XYZ_target_2->setSizeConstraint(QLayout::SetFixedSize);
+        horizontalLayout_XYZ_target_2->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_10 = new QVBoxLayout();
+        verticalLayout_10->setObjectName(QStringLiteral("verticalLayout_10"));
+        label_X_2 = new QLabel(layoutWidget_2);
+        label_X_2->setObjectName(QStringLiteral("label_X_2"));
+        sizePolicy.setHeightForWidth(label_X_2->sizePolicy().hasHeightForWidth());
+        label_X_2->setSizePolicy(sizePolicy);
+        label_X_2->setMaximumSize(QSize(70, 20));
+        label_X_2->setFont(font);
+
+        verticalLayout_10->addWidget(label_X_2);
+
+        textEdit_X = new QTextEdit(layoutWidget_2);
+        textEdit_X->setObjectName(QStringLiteral("textEdit_X"));
+        sizePolicy.setHeightForWidth(textEdit_X->sizePolicy().hasHeightForWidth());
+        textEdit_X->setSizePolicy(sizePolicy);
+        textEdit_X->setMaximumSize(QSize(70, 32));
+        textEdit_X->setFont(font1);
+
+        verticalLayout_10->addWidget(textEdit_X);
+
+
+        horizontalLayout_XYZ_target_2->addLayout(verticalLayout_10);
+
+        verticalLayout_11 = new QVBoxLayout();
+        verticalLayout_11->setObjectName(QStringLiteral("verticalLayout_11"));
+        label_Y_2 = new QLabel(layoutWidget_2);
+        label_Y_2->setObjectName(QStringLiteral("label_Y_2"));
+        sizePolicy.setHeightForWidth(label_Y_2->sizePolicy().hasHeightForWidth());
+        label_Y_2->setSizePolicy(sizePolicy);
+        label_Y_2->setMaximumSize(QSize(70, 20));
+        label_Y_2->setFont(font);
+
+        verticalLayout_11->addWidget(label_Y_2);
+
+        textEdit_Y = new QTextEdit(layoutWidget_2);
+        textEdit_Y->setObjectName(QStringLiteral("textEdit_Y"));
+        sizePolicy.setHeightForWidth(textEdit_Y->sizePolicy().hasHeightForWidth());
+        textEdit_Y->setSizePolicy(sizePolicy);
+        textEdit_Y->setMaximumSize(QSize(70, 32));
+        textEdit_Y->setFont(font1);
+
+        verticalLayout_11->addWidget(textEdit_Y);
+
+
+        horizontalLayout_XYZ_target_2->addLayout(verticalLayout_11);
+
+        verticalLayout_12 = new QVBoxLayout();
+        verticalLayout_12->setObjectName(QStringLiteral("verticalLayout_12"));
+        label_Z_2 = new QLabel(layoutWidget_2);
+        label_Z_2->setObjectName(QStringLiteral("label_Z_2"));
+        sizePolicy.setHeightForWidth(label_Z_2->sizePolicy().hasHeightForWidth());
+        label_Z_2->setSizePolicy(sizePolicy);
+        label_Z_2->setMaximumSize(QSize(70, 20));
+        label_Z_2->setFont(font);
+
+        verticalLayout_12->addWidget(label_Z_2);
+
+        textEdit_Z = new QTextEdit(layoutWidget_2);
+        textEdit_Z->setObjectName(QStringLiteral("textEdit_Z"));
+        sizePolicy.setHeightForWidth(textEdit_Z->sizePolicy().hasHeightForWidth());
+        textEdit_Z->setSizePolicy(sizePolicy);
+        textEdit_Z->setMaximumSize(QSize(70, 32));
+        textEdit_Z->setFont(font1);
+
+        verticalLayout_12->addWidget(textEdit_Z);
+
+
+        horizontalLayout_XYZ_target_2->addLayout(verticalLayout_12);
+
+        verticalLayout_22 = new QVBoxLayout();
+        verticalLayout_22->setObjectName(QStringLiteral("verticalLayout_22"));
+        label_Roll_2 = new QLabel(layoutWidget_2);
+        label_Roll_2->setObjectName(QStringLiteral("label_Roll_2"));
+        sizePolicy.setHeightForWidth(label_Roll_2->sizePolicy().hasHeightForWidth());
+        label_Roll_2->setSizePolicy(sizePolicy);
+        label_Roll_2->setMaximumSize(QSize(70, 20));
+        label_Roll_2->setFont(font);
+
+        verticalLayout_22->addWidget(label_Roll_2);
+
+        textEdit_Roll = new QTextEdit(layoutWidget_2);
+        textEdit_Roll->setObjectName(QStringLiteral("textEdit_Roll"));
+        sizePolicy.setHeightForWidth(textEdit_Roll->sizePolicy().hasHeightForWidth());
+        textEdit_Roll->setSizePolicy(sizePolicy);
+        textEdit_Roll->setMaximumSize(QSize(70, 32));
+        textEdit_Roll->setFont(font1);
+
+        verticalLayout_22->addWidget(textEdit_Roll);
+
+
+        horizontalLayout_XYZ_target_2->addLayout(verticalLayout_22);
+
+        groupBox_4 = new QGroupBox(openGL);
+        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
+        groupBox_4->setGeometry(QRect(10, 160, 341, 91));
+        layoutWidget_8 = new QWidget(groupBox_4);
+        layoutWidget_8->setObjectName(QStringLiteral("layoutWidget_8"));
+        layoutWidget_8->setGeometry(QRect(20, 20, 308, 61));
+        horizontalLayout_XYZ_target_4 = new QHBoxLayout(layoutWidget_8);
+        horizontalLayout_XYZ_target_4->setObjectName(QStringLiteral("horizontalLayout_XYZ_target_4"));
+        horizontalLayout_XYZ_target_4->setSizeConstraint(QLayout::SetFixedSize);
+        horizontalLayout_XYZ_target_4->setContentsMargins(0, 0, 0, 0);
+        verticalLayout_26 = new QVBoxLayout();
+        verticalLayout_26->setObjectName(QStringLiteral("verticalLayout_26"));
+        label_X_4 = new QLabel(layoutWidget_8);
+        label_X_4->setObjectName(QStringLiteral("label_X_4"));
+        sizePolicy.setHeightForWidth(label_X_4->sizePolicy().hasHeightForWidth());
+        label_X_4->setSizePolicy(sizePolicy);
+        label_X_4->setMaximumSize(QSize(70, 20));
+        label_X_4->setFont(font);
+
+        verticalLayout_26->addWidget(label_X_4);
+
+        textEdit_X_Object = new QTextEdit(layoutWidget_8);
+        textEdit_X_Object->setObjectName(QStringLiteral("textEdit_X_Object"));
+        sizePolicy.setHeightForWidth(textEdit_X_Object->sizePolicy().hasHeightForWidth());
+        textEdit_X_Object->setSizePolicy(sizePolicy);
+        textEdit_X_Object->setMaximumSize(QSize(70, 32));
+        textEdit_X_Object->setFont(font1);
+
+        verticalLayout_26->addWidget(textEdit_X_Object);
+
+
+        horizontalLayout_XYZ_target_4->addLayout(verticalLayout_26);
+
+        verticalLayout_27 = new QVBoxLayout();
+        verticalLayout_27->setObjectName(QStringLiteral("verticalLayout_27"));
+        label_Y_4 = new QLabel(layoutWidget_8);
+        label_Y_4->setObjectName(QStringLiteral("label_Y_4"));
+        sizePolicy.setHeightForWidth(label_Y_4->sizePolicy().hasHeightForWidth());
+        label_Y_4->setSizePolicy(sizePolicy);
+        label_Y_4->setMaximumSize(QSize(70, 20));
+        label_Y_4->setFont(font);
+
+        verticalLayout_27->addWidget(label_Y_4);
+
+        textEdit_Y_Object = new QTextEdit(layoutWidget_8);
+        textEdit_Y_Object->setObjectName(QStringLiteral("textEdit_Y_Object"));
+        sizePolicy.setHeightForWidth(textEdit_Y_Object->sizePolicy().hasHeightForWidth());
+        textEdit_Y_Object->setSizePolicy(sizePolicy);
+        textEdit_Y_Object->setMaximumSize(QSize(70, 32));
+        textEdit_Y_Object->setFont(font1);
+
+        verticalLayout_27->addWidget(textEdit_Y_Object);
+
+
+        horizontalLayout_XYZ_target_4->addLayout(verticalLayout_27);
+
+        verticalLayout_30 = new QVBoxLayout();
+        verticalLayout_30->setObjectName(QStringLiteral("verticalLayout_30"));
+        label_Roll_5 = new QLabel(layoutWidget_8);
+        label_Roll_5->setObjectName(QStringLiteral("label_Roll_5"));
+        sizePolicy.setHeightForWidth(label_Roll_5->sizePolicy().hasHeightForWidth());
+        label_Roll_5->setSizePolicy(sizePolicy);
+        label_Roll_5->setMaximumSize(QSize(70, 20));
+        label_Roll_5->setFont(font);
+
+        verticalLayout_30->addWidget(label_Roll_5);
+
+        textEdit_Class = new QTextEdit(layoutWidget_8);
+        textEdit_Class->setObjectName(QStringLiteral("textEdit_Class"));
+        sizePolicy.setHeightForWidth(textEdit_Class->sizePolicy().hasHeightForWidth());
+        textEdit_Class->setSizePolicy(sizePolicy);
+        textEdit_Class->setMaximumSize(QSize(70, 32));
+        textEdit_Class->setFont(font1);
+
+        verticalLayout_30->addWidget(textEdit_Class);
+
+
+        horizontalLayout_XYZ_target_4->addLayout(verticalLayout_30);
+
+        verticalLayout_29 = new QVBoxLayout();
+        verticalLayout_29->setObjectName(QStringLiteral("verticalLayout_29"));
+        label_Roll_4 = new QLabel(layoutWidget_8);
+        label_Roll_4->setObjectName(QStringLiteral("label_Roll_4"));
+        sizePolicy.setHeightForWidth(label_Roll_4->sizePolicy().hasHeightForWidth());
+        label_Roll_4->setSizePolicy(sizePolicy);
+        label_Roll_4->setMaximumSize(QSize(70, 20));
+        label_Roll_4->setFont(font);
+
+        verticalLayout_29->addWidget(label_Roll_4);
+
+        textEdit_Roll_Object = new QTextEdit(layoutWidget_8);
+        textEdit_Roll_Object->setObjectName(QStringLiteral("textEdit_Roll_Object"));
+        sizePolicy.setHeightForWidth(textEdit_Roll_Object->sizePolicy().hasHeightForWidth());
+        textEdit_Roll_Object->setSizePolicy(sizePolicy);
+        textEdit_Roll_Object->setMaximumSize(QSize(70, 32));
+        textEdit_Roll_Object->setFont(font1);
+
+        verticalLayout_29->addWidget(textEdit_Roll_Object);
+
+
+        horizontalLayout_XYZ_target_4->addLayout(verticalLayout_29);
 
         groupBox = new QGroupBox(tab);
         groupBox->setObjectName(QStringLiteral("groupBox"));
@@ -763,16 +891,6 @@ public:
         label_Camera->setFrameShape(QFrame::Box);
         label_Camera->setFrameShadow(QFrame::Raised);
         label_Camera->setLineWidth(5);
-        textEdit_Inform = new QTextEdit(groupBox_2);
-        textEdit_Inform->setObjectName(QStringLiteral("textEdit_Inform"));
-        textEdit_Inform->setGeometry(QRect(10, 330, 260, 80));
-        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(textEdit_Inform->sizePolicy().hasHeightForWidth());
-        textEdit_Inform->setSizePolicy(sizePolicy2);
-        textEdit_Inform->setMinimumSize(QSize(260, 80));
-        textEdit_Inform->setMaximumSize(QSize(260, 80));
         layoutWidget1 = new QWidget(groupBox_2);
         layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
         layoutWidget1->setGeometry(QRect(280, 30, 160, 160));
@@ -862,11 +980,54 @@ public:
         pushButton_StartCamera->setMaximumSize(QSize(20, 20));
         textEdit_Waring = new QTextEdit(groupBox_2);
         textEdit_Waring->setObjectName(QStringLiteral("textEdit_Waring"));
-        textEdit_Waring->setGeometry(QRect(10, 230, 261, 91));
+        textEdit_Waring->setGeometry(QRect(10, 230, 261, 191));
+        textEdit_Inform = new QTextEdit(tab);
+        textEdit_Inform->setObjectName(QStringLiteral("textEdit_Inform"));
+        textEdit_Inform->setGeometry(QRect(280, 390, 150, 190));
+        QSizePolicy sizePolicy2(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(textEdit_Inform->sizePolicy().hasHeightForWidth());
+        textEdit_Inform->setSizePolicy(sizePolicy2);
+        textEdit_Inform->setMinimumSize(QSize(150, 190));
+        textEdit_Inform->setMaximumSize(QSize(150, 190));
         tabWidget->addTab(tab, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));
         tabWidget->addTab(tab_2, QString());
+        tab_3 = new QWidget();
+        tab_3->setObjectName(QStringLiteral("tab_3"));
+        groupBox_3 = new QGroupBox(tab_3);
+        groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
+        groupBox_3->setGeometry(QRect(20, 20, 120, 261));
+        pushButton_Change = new QPushButton(groupBox_3);
+        pushButton_Change->setObjectName(QStringLiteral("pushButton_Change"));
+        pushButton_Change->setGeometry(QRect(10, 230, 75, 23));
+        textEdit_Group1 = new QTextEdit(groupBox_3);
+        textEdit_Group1->setObjectName(QStringLiteral("textEdit_Group1"));
+        textEdit_Group1->setGeometry(QRect(10, 190, 104, 31));
+        label_10 = new QLabel(groupBox_3);
+        label_10->setObjectName(QStringLiteral("label_10"));
+        label_10->setGeometry(QRect(10, 60, 51, 16));
+        textEdit_Line2_up = new QTextEdit(groupBox_3);
+        textEdit_Line2_up->setObjectName(QStringLiteral("textEdit_Line2_up"));
+        textEdit_Line2_up->setGeometry(QRect(10, 130, 104, 31));
+        label_9 = new QLabel(groupBox_3);
+        label_9->setObjectName(QStringLiteral("label_9"));
+        label_9->setGeometry(QRect(10, 10, 47, 13));
+        label_11 = new QLabel(groupBox_3);
+        label_11->setObjectName(QStringLiteral("label_11"));
+        label_11->setGeometry(QRect(10, 110, 61, 16));
+        textEdit_Line1 = new QTextEdit(groupBox_3);
+        textEdit_Line1->setObjectName(QStringLiteral("textEdit_Line1"));
+        textEdit_Line1->setGeometry(QRect(10, 30, 104, 31));
+        label_12 = new QLabel(groupBox_3);
+        label_12->setObjectName(QStringLiteral("label_12"));
+        label_12->setGeometry(QRect(10, 170, 47, 13));
+        textEdit_Line2_low = new QTextEdit(groupBox_3);
+        textEdit_Line2_low->setObjectName(QStringLiteral("textEdit_Line2_low"));
+        textEdit_Line2_low->setGeometry(QRect(10, 80, 104, 31));
+        tabWidget->addTab(tab_3, QString());
 
         gridLayout->addWidget(tabWidget, 0, 0, 1, 1);
 
@@ -890,15 +1051,11 @@ public:
     void retranslateUi(QMainWindow *GuiWindow)
     {
         GuiWindow->setWindowTitle(QApplication::translate("GuiWindow", "MainWindow", Q_NULLPTR));
-        groupBox_Information->setTitle(QApplication::translate("GuiWindow", "Current Position", Q_NULLPTR));
+        groupBox_Information->setTitle(QApplication::translate("GuiWindow", "Robot Position", Q_NULLPTR));
         label_Theta1->setText(QApplication::translate("GuiWindow", "Theta1", Q_NULLPTR));
         label_Theta2->setText(QApplication::translate("GuiWindow", "Theta2", Q_NULLPTR));
         label_D3->setText(QApplication::translate("GuiWindow", "D3(mm)", Q_NULLPTR));
         label_Theta4->setText(QApplication::translate("GuiWindow", "Theta4", Q_NULLPTR));
-        label_X_2->setText(QApplication::translate("GuiWindow", "X(mm)", Q_NULLPTR));
-        label_Y_2->setText(QApplication::translate("GuiWindow", "Y(mm)", Q_NULLPTR));
-        label_Z_2->setText(QApplication::translate("GuiWindow", "Z(mm)", Q_NULLPTR));
-        label_Roll_2->setText(QApplication::translate("GuiWindow", "ROLL(deg)", Q_NULLPTR));
         label->setText(QApplication::translate("GuiWindow", "<html><head/><body><p><span style=\" font-weight:600;\">THETA1</span></p></body></html>", Q_NULLPTR));
         label_var0_min->setText(QApplication::translate("GuiWindow", "-85", Q_NULLPTR));
         label_var0_max->setText(QApplication::translate("GuiWindow", "85", Q_NULLPTR));
@@ -911,6 +1068,15 @@ public:
         label_4->setText(QApplication::translate("GuiWindow", "<html><head/><body><p><span style=\" font-weight:600;\">THETA4</span></p></body></html>", Q_NULLPTR));
         label_var3_min->setText(QApplication::translate("GuiWindow", "-170", Q_NULLPTR));
         label_var3_max->setText(QApplication::translate("GuiWindow", "170", Q_NULLPTR));
+        label_X_2->setText(QApplication::translate("GuiWindow", "X(mm)", Q_NULLPTR));
+        label_Y_2->setText(QApplication::translate("GuiWindow", "Y(mm)", Q_NULLPTR));
+        label_Z_2->setText(QApplication::translate("GuiWindow", "Z(mm)", Q_NULLPTR));
+        label_Roll_2->setText(QApplication::translate("GuiWindow", "ROLL(deg)", Q_NULLPTR));
+        groupBox_4->setTitle(QApplication::translate("GuiWindow", "Object Position", Q_NULLPTR));
+        label_X_4->setText(QApplication::translate("GuiWindow", "X(mm)", Q_NULLPTR));
+        label_Y_4->setText(QApplication::translate("GuiWindow", "Y(mm)", Q_NULLPTR));
+        label_Roll_5->setText(QApplication::translate("GuiWindow", "CLASS", Q_NULLPTR));
+        label_Roll_4->setText(QApplication::translate("GuiWindow", "ROLL(deg)", Q_NULLPTR));
         groupBox->setTitle(QApplication::translate("GuiWindow", "Robot", Q_NULLPTR));
         label_Comport->setText(QApplication::translate("GuiWindow", "COM PORT", Q_NULLPTR));
         label_Baudrate->setText(QApplication::translate("GuiWindow", "BAUD RATE", Q_NULLPTR));
@@ -931,6 +1097,33 @@ public:
         pushButton_StartCamera->setText(QString());
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("GuiWindow", "VISION MODE", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("GuiWindow", "JOB MODE", Q_NULLPTR));
+        groupBox_3->setTitle(QApplication::translate("GuiWindow", "Deal", Q_NULLPTR));
+        pushButton_Change->setText(QApplication::translate("GuiWindow", "Change", Q_NULLPTR));
+        textEdit_Group1->setHtml(QApplication::translate("GuiWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">1.5</p></body></html>", Q_NULLPTR));
+        label_10->setText(QApplication::translate("GuiWindow", "line2 lower", Q_NULLPTR));
+        textEdit_Line2_up->setHtml(QApplication::translate("GuiWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">40</p></body></html>", Q_NULLPTR));
+        label_9->setText(QApplication::translate("GuiWindow", "line 1", Q_NULLPTR));
+        label_11->setText(QApplication::translate("GuiWindow", "line 2 upper", Q_NULLPTR));
+        textEdit_Line1->setHtml(QApplication::translate("GuiWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">1.5</p></body></html>", Q_NULLPTR));
+        label_12->setText(QApplication::translate("GuiWindow", "group 1", Q_NULLPTR));
+        textEdit_Line2_low->setHtml(QApplication::translate("GuiWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">33</p></body></html>", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("GuiWindow", "SETTING", Q_NULLPTR));
     } // retranslateUi
 
 };

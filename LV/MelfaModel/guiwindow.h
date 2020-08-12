@@ -58,17 +58,18 @@ private:
 	/*--Camera--*/
 	bool detectObject(cv::Mat frame, cv::Mat &out);
 	// Remove the bounding boxes with low confidence using non-maxima suppression
-	void postProcess(cv::Mat& frame, const std::vector<cv::Mat>& outs);
+	void postProcess(cv::Mat& frame, cv::Mat& show, const std::vector<cv::Mat>& outs);
 
 	// Draw the predicted bounding box
 	bool drawPred(int classId, double conf, int left, int top, int right, int bottom,
-					cv::Mat& frame, double &angle, double &x, double &y);
+					cv::Mat& frame, cv::Mat& show, double &angle, double &x, double &y);
 	void showFrame(bool dynamic);
 	void showCamera(cv::Mat img, QImage::Format format);
 	Vec3f calcParams(Point2f p1, Point2f p2);
 	Point findIntersection(Vec3f params1, Vec3f params2);
 	double disPoint2Line(Vec3f param, Point A);
 	double disPoint2Point(Point A, Point B);
+	Vec3f vuongParams(Vec3f delta, Point2f A);
 
 	// Select ROI
 	void selectROI(cv::Mat frame, cv::Mat &matROI);
@@ -95,15 +96,16 @@ private slots:
 	void on_pushButton_Start_clicked();
 	void on_pushButton_Japan_Full_clicked();
 	void on_pushButton_Vietnam_Full_clicked();
+	void on_pushButton_Change_clicked();
 	void slide_Velocity();
 	void slide_Accelerate();
 	
 
 	/*--Camera--*/
-	
 	void moveJoint(double centerX, double centerY, double Z, double roll);
 	void timer_CAM_handle();
 	void timer_OBJECT_handle();
+
 
 	/*--Robot--*/
 	void serial_updatePortName();                                   // connect timeout timer check
@@ -122,6 +124,11 @@ private:
 	QTimer *timer_CAM;
 	bool	pick = false;
 	Object	*object = nullptr;
+
+	double thres_line_1 = 1.5;
+	double thres_line_2_low = 33;
+	double thres_line_2_up = 40;
+	double thres_group_1 = 1.5;
 	/*--Robot--*/
     RobotControll *controller;
 	QTimer *timer_serial_comboBox = nullptr;
