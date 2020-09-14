@@ -6,6 +6,9 @@
 #include <QElapsedTimer>
 #include <QtSerialPort/QSerialPort>
 #include <QMessageBox>
+#include <QFile>
+#include <QTextStream>
+#include <QFileDialog>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
@@ -97,6 +100,7 @@ private slots:
 	void on_pushButton_Japan_Full_clicked();
 	void on_pushButton_Vietnam_Full_clicked();
 	void on_pushButton_Change_clicked();
+	void on_pushButton_Log_clicked();
 	void slide_Velocity();
 	void slide_Accelerate();
 	
@@ -121,6 +125,8 @@ private:
     Ui::GuiWindow *ui;
 	OpenGLWindow *openGLWindow;
 	/*--Camera--*/
+	QVector<double> x_cam, y_cam, roll_cam;
+	QVector<double> x_robot, y_robot, roll_robot;
 	QTimer *timer_CAM;
 	bool	pick = false;
 	Object	*object = nullptr;
@@ -141,6 +147,7 @@ private:
 	QTimer *timer_OBJECT;
 	bool idle_robot = false;
 	QString portName;
+	double x_update, y_update, roll_update;
 
 };
 

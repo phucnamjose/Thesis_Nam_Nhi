@@ -250,7 +250,7 @@ private:
             bool          istimeout         = false;
             bool          scan                    = false;
             double     x, y, z, roll;
-            double     var0, var1, var2, var3;
+            double     var0 = 0, var1 = 0, var2 = 0, var3 = 0;
             double     lenght;
 
             // transmit varialble ---> main thread

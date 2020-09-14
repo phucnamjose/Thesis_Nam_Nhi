@@ -129,6 +129,7 @@ public:
     QVBoxLayout *verticalLayout_7;
     QPushButton *pushButton_Scan;
     QPushButton *pushButton_Stop;
+    QPushButton *pushButton_Log;
     QVBoxLayout *verticalLayout_6;
     QPushButton *pushButton_Home;
     QPushButton *pushButton_Start;
@@ -149,7 +150,6 @@ public:
     QPushButton *pushButton_StartCamera;
     QTextEdit *textEdit_Waring;
     QTextEdit *textEdit_Inform;
-    QWidget *tab_2;
     QWidget *tab_3;
     QGroupBox *groupBox_3;
     QPushButton *pushButton_Change;
@@ -812,6 +812,21 @@ public:
 
         verticalLayout_7->addWidget(pushButton_Stop);
 
+        pushButton_Log = new QPushButton(layoutWidget);
+        pushButton_Log->setObjectName(QStringLiteral("pushButton_Log"));
+        sizePolicy.setHeightForWidth(pushButton_Log->sizePolicy().hasHeightForWidth());
+        pushButton_Log->setSizePolicy(sizePolicy);
+        pushButton_Log->setMinimumSize(QSize(60, 0));
+        pushButton_Log->setMaximumSize(QSize(60, 30));
+        pushButton_Log->setStyleSheet(QLatin1String("color: white;\n"
+"border-width: 2px;\n"
+"border-style: solid;\n"
+"border-color:black;\n"
+"border-radius:10px;\n"
+"background-color:gray;"));
+
+        verticalLayout_7->addWidget(pushButton_Log);
+
 
         horizontalLayout->addLayout(verticalLayout_7);
 
@@ -927,6 +942,11 @@ public:
         sizePolicy.setHeightForWidth(textEdit_Japan_Num->sizePolicy().hasHeightForWidth());
         textEdit_Japan_Num->setSizePolicy(sizePolicy);
         textEdit_Japan_Num->setMaximumSize(QSize(50, 40));
+        QFont font2;
+        font2.setPointSize(12);
+        font2.setBold(true);
+        font2.setWeight(75);
+        textEdit_Japan_Num->setFont(font2);
 
         horizontalLayout_9->addWidget(textEdit_Japan_Num);
 
@@ -935,6 +955,7 @@ public:
         sizePolicy.setHeightForWidth(textEdit_Vietnam_Num->sizePolicy().hasHeightForWidth());
         textEdit_Vietnam_Num->setSizePolicy(sizePolicy);
         textEdit_Vietnam_Num->setMaximumSize(QSize(50, 40));
+        textEdit_Vietnam_Num->setFont(font2);
 
         horizontalLayout_9->addWidget(textEdit_Vietnam_Num);
 
@@ -992,9 +1013,6 @@ public:
         textEdit_Inform->setMinimumSize(QSize(150, 190));
         textEdit_Inform->setMaximumSize(QSize(150, 190));
         tabWidget->addTab(tab, QString());
-        tab_2 = new QWidget();
-        tab_2->setObjectName(QStringLiteral("tab_2"));
-        tabWidget->addTab(tab_2, QString());
         tab_3 = new QWidget();
         tab_3->setObjectName(QStringLiteral("tab_3"));
         groupBox_3 = new QGroupBox(tab_3);
@@ -1085,6 +1103,7 @@ public:
         label_Accelerate->setText(QApplication::translate("GuiWindow", "ACCERLERATE", Q_NULLPTR));
         pushButton_Scan->setText(QApplication::translate("GuiWindow", "SCAN", Q_NULLPTR));
         pushButton_Stop->setText(QApplication::translate("GuiWindow", "STOP", Q_NULLPTR));
+        pushButton_Log->setText(QApplication::translate("GuiWindow", "LOG", Q_NULLPTR));
         pushButton_Home->setText(QApplication::translate("GuiWindow", "HOME", Q_NULLPTR));
         pushButton_Start->setText(QApplication::translate("GuiWindow", "START", Q_NULLPTR));
         pushButton_SetROI->setText(QApplication::translate("GuiWindow", "ROI", Q_NULLPTR));
@@ -1096,7 +1115,6 @@ public:
         pushButton_Vietnam_Full->setText(QApplication::translate("GuiWindow", "VN FULL", Q_NULLPTR));
         pushButton_StartCamera->setText(QString());
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("GuiWindow", "VISION MODE", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("GuiWindow", "JOB MODE", Q_NULLPTR));
         groupBox_3->setTitle(QApplication::translate("GuiWindow", "Deal", Q_NULLPTR));
         pushButton_Change->setText(QApplication::translate("GuiWindow", "Change", Q_NULLPTR));
         textEdit_Group1->setHtml(QApplication::translate("GuiWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"

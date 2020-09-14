@@ -15,7 +15,7 @@ const char* comboBox_Name[COMBOBOX_NUM] = { "comboBox_Comport","comboBox_Baudrat
 
 /*--Robot--*/
 double Zhigh = 120.0;
-double Zlow = 38;
+double Zlow = 36;
 double Xplace = 240;
 double Yplace = -170;
 double roll_place = -90;
@@ -33,7 +33,7 @@ extern Mat blob;
 extern Net net;
 extern vector<string> classes;
 // Network Params
-float confThreshold = 0.95; // Confidence threshold
+float confThreshold = 0.9; // Confidence threshold
 float nmsThreshold = 0.5;  // Non-maximum suppression threshold
 int inpWidth = 416;        // Width of network's input image
 int inpHeight = 416;       // Height of network's input image
@@ -132,6 +132,7 @@ vector<String>  getOutputsNames(const Net& net)
 
 void GuiWindow::postProcess(Mat& frame, Mat& show, const vector<Mat>& outs)
 {
+	
 	vector<double> X, Y, ANGLE_TRUE, X_TRUE, Y_TRUE;
 	vector<int> classIds, ID_TRUE;
 	vector<float> confidences;
@@ -160,10 +161,12 @@ void GuiWindow::postProcess(Mat& frame, Mat& show, const vector<Mat>& outs)
 				int left = x_roi - width / 2;
 				int top = y_roi - height / 2;
 
+			
 				classIds.push_back(classIdPoint.x);
 				confidences.push_back((float)confidence);
 				boxes.push_back(Rect(left, top, width, height));
 			}
+			
 		}
 	}
 	//ui->textEdit_Position->append(tr("X size: %1 \n").arg(X.size()));
@@ -178,19 +181,20 @@ void GuiWindow::postProcess(Mat& frame, Mat& show, const vector<Mat>& outs)
 		double x, y;
 		int idx = indices[i];
 		Rect box = boxes[idx];
+
 		if (drawPred(classIds[idx], confidences[idx], box.x, box.y,
 			box.x + box.width, box.y + box.height, frame, show, angle, x ,y))
 		{
 			ID_TRUE.push_back(classIds.at(idx));
-			x = x + x_pos[0];
-			y = y + y_pos[0];
+			x += x_pos[0];
+			y += y_pos[0];
 			double x_absolute = W11 + W21*x + W31*y;
 			double y_absolute = W12 + W22*x + W32*y;
 			X_TRUE.push_back(x_absolute);
 			Y_TRUE.push_back(y_absolute);
 			ANGLE_TRUE.push_back(angle);
-			ui->textEdit_Inform->insertPlainText(tr("Thiet = %1 %2")
-				.arg(x_absolute).arg(y_absolute));
+			//ui->textEdit_Waring->insertPlainText(tr("x = %1\n  y= %2\n  phi = %3 \n ")
+			//	.arg(X_TRUE.at(0)).arg(Y_TRUE.at(0)).arg(ANGLE_TRUE.at(0)));
 		}
 	}
 
@@ -210,7 +214,8 @@ void GuiWindow::postProcess(Mat& frame, Mat& show, const vector<Mat>& outs)
 // Draw the predicted bounding box
 bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right, int bottom, 
 				Mat& frame, Mat& show, double &angle, double &x, double &y)
-{
+{   
+
 	ui->textEdit_Inform->clear();
 	float W1 = 89.34795488, W2 = -1.00310605;
 	// BEFORE CUT IMAGE CONTAIN BOUNDING BOX
@@ -220,7 +225,10 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 	r.y = top - 10;
 	r.width = right - left + 20;  //right-left is %d //r.width  is float 
 	r.height = bottom - top + 20;
-
+	int width = right - left;
+	int height = bottom - top;
+	if (width > 72 || height > 72 || width*height > 5000 )
+		return false;
 
 	//ui->textEdit_Inform->insertPlainText(tr("width: %1 pixel\n").arg(right - left));
 	//ui->textEdit_Inform->insertPlainText(tr("height: %1 pixel\n").arg(bottom - top));
@@ -244,19 +252,19 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		int blockSize = 3;
 		double conSub = 2;
 		adaptiveThreshold(gray, frame_threshold, max_value, method, threshold_type, blockSize, conSub);
-		
+		//imshow(" thresh ", frame_threshold);
 		//**Filter Blur**
 		Mat frame_filter;
 		blur(frame_threshold, frame_filter, Size(3, 3));
 
 		//**Draw circle**
 		circle(frame_filter, Point(r.width / 2, r.height / 2), 18, Scalar(255, 255, 255), -1, LINE_8);
-	
+	    
 		//**Detect edges using canny**
 		Mat canny;
-		Canny(frame_filter, canny, 400, 600, 3);
-		imshow("Canny", canny);
-		
+		Canny(frame_filter, canny, 300, 600, 3);
+		//imshow("Canny", canny);
+		//imshow(" cany ", canny);
 		//**HoughLines**
 		vector<Vec4i> lines_angle;
 		vector<Vec4i> lines_intersection;
@@ -273,7 +281,7 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		Vec3f param_vuong1;
 		Vec3f param_vuong2;
 		// 2 line
-		HoughLinesP(canny, lines_angle, 1, CV_PI / 180, 30, 45, 5);
+		HoughLinesP(canny, lines_angle, 1, CV_PI / 180, 25, 45, 5);
 		// 4 line
 		HoughLinesP(canny, lines_intersection, 1, CV_PI / 180, 10, 8, 5);
 
@@ -335,8 +343,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 			if (corners_angle.size() != 0)
 			{
 				ui->textEdit_Inform->insertPlainText("Return corners angle size =! 0");
-				imshow("Object_1", drawing);
-				imshow("Object_2", drawing_2);
+				//imshow("Object_1", drawing);
+				//imshow("Object_2", drawing_2);
 				return false;
 			}
 		}
@@ -362,8 +370,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 		if (lines_intersection.size() < 4)
 		{
 			ui->textEdit_Inform->insertPlainText("Return line intersec < 4");
-			imshow("Object_1", drawing);
-			imshow("Object_2", drawing_2);
+			//imshow("Object_1", drawing);
+			//imshow("Object_2", drawing_2);
 			return false;
 		}
 		else
@@ -404,8 +412,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 			if (corners_intersection.size() < 4)
 			{
 				ui->textEdit_Inform->insertPlainText("Return corner_intersec < 4");
-				imshow("Object_1", drawing);
-				imshow("Object_2", drawing_2);
+				//imshow("Object_1", drawing);
+				//imshow("Object_2", drawing_2);
 				return false;
 			}
 			//---------------
@@ -428,8 +436,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 			if ( corners_line1.size() == 0)
 			{
 				ui->textEdit_Inform->insertPlainText("Return line 1 = 0");
-				imshow("Object_1", drawing);
-				imshow("Object_2", drawing_2);
+				//imshow("Object_1", drawing);
+				//imshow("Object_2", drawing_2);
 				return false;
 			}
 			for (int i = 0; i < corners_line1.size(); i++)
@@ -456,8 +464,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 			if (corners_line2.size() == 0)
 			{
 				ui->textEdit_Inform->insertPlainText("Return line 2 = 0");
-				imshow("Object_1", drawing);
-				imshow("Object_2", drawing_2);
+				//imshow("Object_1", drawing);
+				//imshow("Object_2", drawing_2);
 				return false;
 			}
 			for (int i = 0; i < corners_line2.size(); i++)
@@ -519,8 +527,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 				|| corners_group4.size() == 0)
 			{
 				ui->textEdit_Inform->insertPlainText("1 group = 0");
-				imshow("Object_1", drawing);
-				imshow("Object_2", drawing_2);
+				//imshow("Object_1", drawing);
+				//imshow("Object_2", drawing_2);
 				return false;
 			}
 
@@ -566,8 +574,8 @@ bool GuiWindow::drawPred(int classId, double conf, int left, int top, int right,
 			y = avr_yCenter + r.y;
 
 
-			imshow("Object_1", drawing);
-			imshow("Object_2", drawing_2);
+			//imshow("Object_1", drawing);
+			//imshow("Object_2", drawing_2);
 			
 
 		}
@@ -860,6 +868,13 @@ void GuiWindow::pickAndPlace()
 			{
 				controller->robotMoveJoint(target.x, target.y,
 											Zlow, roll_pick);
+				// log data
+				x_cam.append(target.x);
+				y_cam.append(target.y);
+				roll_cam.append(roll_pick);
+				x_robot.append(x_update);
+				y_robot.append(y_update);
+				roll_robot.append(roll_update);
 			}
 		break;
 
@@ -1053,6 +1068,13 @@ void GuiWindow::on_pushButton_Home_clicked()
 	controller->robotOutput(false);
 	controller->robotMoveHome();
 
+	// delete log data
+	x_cam.clear();
+	y_cam.clear();
+	roll_cam.clear();
+	x_robot.clear();
+	y_robot.clear();
+	roll_robot.clear();
 }
 
 void  GuiWindow::on_pushButton_Stop_clicked()
@@ -1100,6 +1122,7 @@ void GuiWindow::on_pushButton_Japan_Full_clicked()
 	japan_full = false;
 	target_success_jp = 0;
 	ui->textEdit_Waring->insertPlainText("JAPAN COL IS CLEAR\n");
+	ui->textEdit_Japan_Num->setText(tr("%1").arg(target_success_jp));
 }
 
 void GuiWindow::on_pushButton_Vietnam_Full_clicked()
@@ -1107,6 +1130,7 @@ void GuiWindow::on_pushButton_Vietnam_Full_clicked()
 	vietnam_full = false;
 	target_success_vn = 0;
 	ui->textEdit_Waring->insertPlainText("VIETNAM COL IS CLEAR\n");
+	ui->textEdit_Vietnam_Num->setText(tr("%1").arg(target_success_vn));
 }
 
 void GuiWindow::displayPosition(double x, double y, double roll) 
@@ -1118,6 +1142,10 @@ void GuiWindow::updatePosition(double x, double y, double z, double roll,
 	double var0, double var1, double var2, double var3,
 	double lenght, double time_run, double time_total)
 {
+	x_update = x;
+	y_update = y;
+	roll_update = roll;
+
 	ui->openGL->setAngle(var0, var1, var2, var3);
 	ui->textEdit_Japan_Num->setText(tr("%1").arg(target_success_jp));
 	ui->textEdit_Vietnam_Num->setText(tr("%1").arg(target_success_vn));
@@ -1142,6 +1170,35 @@ void GuiWindow::on_pushButton_Change_clicked()
 	thres_line_2_low = ui->textEdit_Line2_low->toPlainText().toDouble();
 	thres_line_2_up = ui->textEdit_Line2_up->toPlainText().toDouble();
 	thres_group_1 = ui->textEdit_Group1->toPlainText().toDouble();
+}
+
+void GuiWindow::on_pushButton_Log_clicked() 
+{
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+		tr("data.txt"), tr("Text file (*.txt)"));
+	if (fileName.isEmpty()) {
+		qDebug() << "Open save window fail";
+		return;
+	}
+	QFile file(fileName);
+	if (!file.open(QFile::WriteOnly | QFile::Text)) {
+		QMessageBox::warning(this, tr("SDI"),
+			tr("Cannot write file %1:\n%2.")
+			.arg(QDir::toNativeSeparators(fileName), file.errorString()));
+		return;
+	}
+
+	QTextStream out(&file);
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+
+	out << QString(tr("(X_cam Y_cam Z_cam X_robot Y_robot Z_robot)\n"));
+
+	for (int i = 0; i < x_cam.size(); i++) {
+		out << QString(tr("%1 %2 %3 %4 %5 %6\n")
+			.arg(x_cam.at(i)).arg(y_cam.at(i)).arg(roll_cam.at(i))
+			.arg(x_robot.at(i)).arg(y_robot.at(i)).arg(roll_robot.at(i)));
+	}
+	QApplication::restoreOverrideCursor();
 }
 
 double GuiWindow::angleProcess(double x, double y, double angle)

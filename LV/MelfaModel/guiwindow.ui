@@ -1364,6 +1364,39 @@ background-color:gray;
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_Log">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: white;
+border-width: 2px;
+border-style: solid;
+border-color:black;
+border-radius:10px;
+background-color:gray;</string>
+              </property>
+              <property name="text">
+               <string>LOG</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -1615,6 +1648,13 @@ background-color:gray;
                 <height>40</height>
                </size>
               </property>
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
              </widget>
             </item>
             <item>
@@ -1630,6 +1670,13 @@ background-color:gray;
                 <width>50</width>
                 <height>40</height>
                </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
              </widget>
             </item>
@@ -1759,11 +1806,6 @@ background-color:gray;</string>
          </size>
         </property>
        </widget>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>JOB MODE</string>
-       </attribute>
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
